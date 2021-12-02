@@ -19,7 +19,7 @@ jobs:
         with:
           ref: ${{ github.head_ref }}
       - name: Update version file
-        run: echo "${{ github.event.inputs.version }}" > VERSION
+        run: echo -n "${{ github.event.inputs.version }}" > VERSION
       - name: Commit version file
         run: |
           git config --global user.name ${{ github.actor }}
@@ -31,6 +31,6 @@ jobs:
         run: git tag ${{ github.event.inputs.version }}
       - name: Push all
         run: |
-          git push --tags
+          git push VERSION --tags
 #          git push origin ${{ github.ref_name }}
 #          git push origin ${{ github.event.inputs.version }}
