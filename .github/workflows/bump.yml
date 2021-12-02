@@ -31,5 +31,5 @@ jobs:
         run: git tag ${{ github.event.inputs.version }}
       - name: Push all
         run: |
-          git push origin ${{ github.ref_name }}
+          git push origin master
           git push origin ${{ github.event.inputs.version }}
