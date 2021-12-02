@@ -29,8 +29,11 @@ jobs:
           git commit -am "Automated version update to ${{ github.event.inputs.version }}"
       - name: Example variable usage
         run: git tag ${{ github.event.inputs.version }}
+      - name: Current status
+        run: |
+          git log --raw
+          git tag
       - name: Push all
         run: |
-          git push VERSION --tags
-#          git push origin ${{ github.ref_name }}
-#          git push origin ${{ github.event.inputs.version }}
+          git push origin ${{ github.ref_name }}
+          git push ${{ github.event.inputs.version }}
