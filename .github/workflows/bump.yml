@@ -26,9 +26,8 @@ jobs:
           git config --global user.email '${{ github.actor }}@users.noreply.github.com'
           git remote set-url origin https://x-access-token:${{ secrets.GITHUB_TOKEN }}@github.com/${{ github.repository }}
           git commit -am "Automated version update to ${{ github.event.inputs.version }}"
-      - name: Tag new commit
-        run: git tag ${{ github.event.inputs.version }}
-      - name: Push all
-        run: |
           git push origin
+      - name: Tag new commit
+        run: |
+          git tag ${{ github.event.inputs.version }}
           git push origin ${{ github.event.inputs.version }}
