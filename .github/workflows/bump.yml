@@ -25,13 +25,10 @@ jobs:
           git config --global user.name ${{ github.actor }}
           git config --global user.email '${{ github.actor }}@users.noreply.github.com'
           git remote set-url origin https://x-access-token:${{ secrets.GITHUB_TOKEN }}@github.com/${{ github.repository }}
-          # git checkout -b master origin/master | git pull origin master
-          git branch
-          git status
           git commit -am "Automated version update to ${{ github.event.inputs.version }}"
-      - name: Example variable usage
+      - name: Tag new commit
         run: git tag ${{ github.event.inputs.version }}
       - name: Push all
         run: |
-          git push origin master
+          git push origin
           git push origin ${{ github.event.inputs.version }}
