@@ -35,5 +35,5 @@ jobs:
           git tag
       - name: Push all
         run: |
-          git push origin ${{ github.ref_name }}
-          git push ${{ github.event.inputs.version }}
+          git push
+          git push --tags
