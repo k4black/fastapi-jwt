@@ -32,4 +32,4 @@ jobs:
         run: |
           git status
           git log --raw
-          git push
+          git push origin ${{ github.event.inputs.version }}
