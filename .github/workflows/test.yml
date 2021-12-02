@@ -31,8 +31,6 @@ jobs:
           run: python -m flake8 fastapi_jwt
       -   name: Run mypy
           run: python -m mypy fastapi_jwt
-      -   name: Run pylint
-          run: python -m pylint fastapi_jwt
 
   test-python:
     runs-on: ubuntu-latest
@@ -59,11 +57,12 @@ jobs:
           python -m pip install wheel
           python -m pip install -e .[test]
       - name: Test itself
-        run: python -m pytest
+        run: python -m pytest --cov-report=xml
       - name: Upload coverage
         uses: codecov/codecov-action@v2
         with:
           token: ${{ secrets.CODECOV_TOKEN }} # not required for public repos
+          files: coverage.xml
           flags: unittests # optional
           fail_ci_if_error: true # optional (default = false)
           verbose: true # optional (default = false)
