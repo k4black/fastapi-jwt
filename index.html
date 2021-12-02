@@ -439,7 +439,7 @@
 <a href="https://github.com/k4black/fastapi-jwt/actions/workflows/publish.yml"><img alt="Publish" src="https://github.com/k4black/fastapi-jwt/actions/workflows/publish.yml/badge.svg" /></a>
 <a href="https://codecov.io/gh/k4black/fastapi-jwt"><img alt="codecov" src="https://codecov.io/gh/k4black/fastapi-jwt/branch/master/graph/badge.svg?token=3F9J850FX2" /></a>
 <a href="https://pypi.org/project/fastapi-jwt/"><img alt="pypi" src="https://img.shields.io/pypi/v/fastapi-jwt" /></a></p>
-<p>Native FastAPI extension for JWT auth</p>
+<p>FastAPI native extension, easy and simple JWT auth</p>
 <hr />
 <p><strong>Documentation:</strong> https://k4black.github.io/fastapi-jwt/<br />
 <strong>Source Code:</strong> https://github.com/k4black/fastapi-jwt/  </p>
@@ -468,7 +468,7 @@ def read_current_user(
 ):
     return {&quot;username&quot;: credentials[&quot;username&quot;], &quot;role&quot;: credentials[&quot;role&quot;]}
 </code></pre>
-<p>For more examples see (usage docs)[./docs/docs/user_guide.md]</p>
+<p>For more examples see usage docs</p>
 <h2 id="alternatives">Alternatives</h2>
 <ul>
 <li>FastAPI docs suggest <a href="https://fastapi.tiangolo.com/tutorial/security/oauth2-jwt/">writing it manually</a>, but</li>
@@ -480,7 +480,7 @@ def read_current_user(
 <p>There is nice <a href="https://github.com/IndominusByte/fastapi-jwt-auth/">fastapi-jwt-auth</a>, but</p>
 </li>
 <li>poorly supported  </li>
-<li>not "fastapi-style" (not native functions parameters)</li>
+<li>not "FastAPI-style" (not native functions parameters)</li>
 </ul>
 <h2 id="fastapi-integration">FastAPI Integration</h2>
 <p>There it is open and maintained <a href="https://github.com/tiangolo/fastapi/pull/3305">Pull Request #3305</a> to the <code>fastapi</code> repo. Currently, not considered.</p>
