@@ -20,13 +20,6 @@ jobs:
           ref: ${{ github.head_ref }}
       - name: Update version file
         run: echo -n "${{ github.event.inputs.version }}" > VERSION
-      - name: Current status
-        run: |
-          git status
-          git remote
-          git branch -a
-          git log --raw
-          git tag
       - name: Commit version file
         run: |
           git config --global user.name ${{ github.actor }}
@@ -36,14 +29,7 @@ jobs:
           git commit -am "Automated version update to ${{ github.event.inputs.version }}"
       - name: Example variable usage
         run: git tag ${{ github.event.inputs.version }}
-      - name: Current status
-        run: |
-          git status
-          git remote
-          git branch -a
-          git log --raw
-          git tag
       - name: Push all
         run: |
           git push origin ${{ github.ref_name }}
-          git push --tags
+          git push origin ${{ github.event.inputs.version }}
