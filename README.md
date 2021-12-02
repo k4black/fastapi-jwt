@@ -5,7 +5,7 @@
 [![codecov](https://codecov.io/gh/k4black/fastapi-jwt/branch/master/graph/badge.svg?token=3F9J850FX2)](https://codecov.io/gh/k4black/fastapi-jwt)
 [![pypi](https://img.shields.io/pypi/v/fastapi-jwt)](https://pypi.org/project/fastapi-jwt/)
 
-Native FastAPI extension for JWT auth
+FastAPI native extension, easy and simple JWT auth
 
 ---
 
@@ -45,7 +45,7 @@ def read_current_user(
     return {"username": credentials["username"], "role": credentials["role"]}
 ```
 
-For more examples see (usage docs)[./docs/docs/user_guide.md]
+For more examples see usage docs
 
 
 ## Alternatives 
@@ -56,7 +56,7 @@ For more examples see (usage docs)[./docs/docs/user_guide.md]
 
 * There is nice [fastapi-jwt-auth](https://github.com/IndominusByte/fastapi-jwt-auth/), but
   * poorly supported  
-  * not "fastapi-style" (not native functions parameters)
+  * not "FastAPI-style" (not native functions parameters)
 
 ## FastAPI Integration 
 
