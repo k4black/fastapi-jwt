@@ -21,13 +21,15 @@ pip install fastapi-jwt
 
 
 ## Usage
-This library made in fastapi style, so it can be used similarly with standard security features 
+This library made in fastapi style, so it can be used as standard security features 
 
 ```python
+from fastapi import FastAPI, Security
+from fastapi_jwt import JwtAuthorizationCredentials, JwtAccessBearer
+
+
 app = FastAPI()
-
-
-access_security = JwtAccessBearer(secret_key="secret_key", auto_error=False)
+access_security = JwtAccessBearer(secret_key="secret_key", auto_error=True)
 
 
 @app.post("/auth")
@@ -42,6 +44,8 @@ def read_current_user(
 ):
     return {"username": credentials["username"], "role": credentials["role"]}
 ```
+
+For more examples see (usage docs)[./docs/docs/user_guide.md]
 
 
 ## Alternatives 

@@ -15,6 +15,13 @@ except ImportError:  # pragma: nocover
     jwt = None
 
 
+__all__ = [
+    'JwtAuthorizationCredentials',
+    'JwtAccessBearer', 'JwtAccessCookie', 'JwtAccessBearerCookie',
+    'JwtRefreshBearer', 'JwtRefreshCookie', 'JwtRefreshBearerCookie',
+]
+
+
 class JwtAuthorizationCredentials:
     def __init__(self, subject: Dict[str, Any], jti: Optional[str] = None):
         self.subject = subject
@@ -66,19 +73,11 @@ class JwtAuthBase(ABC):
 
         self.secret_key = secret_key
 
-        self.places = {"header"} if places is None else places
+        self.places = places or {"header"}
         self.auto_error = auto_error
         self.algorithm = algorithm
-        self.access_expires_delta = (
-            timedelta(minutes=15)
-            if access_expires_delta is None
-            else access_expires_delta
-        )
-        self.refresh_expires_delta = (
-            timedelta(days=31)
-            if refresh_expires_delta is None
-            else refresh_expires_delta
-        )
+        self.access_expires_delta = access_expires_delta or timedelta(minutes=15)
+        self.refresh_expires_delta = refresh_expires_delta or timedelta(days=31)
 
     def _decode(self, token: str) -> Optional[Dict[str, Any]]:
         try:
@@ -148,9 +147,7 @@ class JwtAuthBase(ABC):
     def create_access_token(
         self, subject: Dict[str, Any], expires_delta: Optional[timedelta] = None
     ) -> str:
-        expires_delta = (
-            expires_delta if expires_delta is not None else self.access_expires_delta
-        )
+        expires_delta = expires_delta or self.access_expires_delta
         to_encode = self._generate_payload(subject, expires_delta)
 
         jwt_encoded: str = jwt.encode(
@@ -161,9 +158,7 @@ class JwtAuthBase(ABC):
     def create_refresh_token(
         self, subject: Dict[str, Any], expires_delta: Optional[timedelta] = None
     ) -> str:
-        expires_delta = (
-            expires_delta if expires_delta is not None else self.refresh_expires_delta
-        )
+        expires_delta = expires_delta or self.refresh_expires_delta
         to_encode = self._generate_payload(subject, expires_delta)
 
         # Adding creating refresh token mark
