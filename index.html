@@ -289,19 +289,6 @@
     Alternatives
   </a>
   
-    <nav class="md-nav" aria-label="Alternatives">
-      <ul class="md-nav__list">
-        
-          <li class="md-nav__item">
-  <a href="#fastapi-jwt-auth" class="md-nav__link">
-    fastapi-jwt-auth
-  </a>
-  
-</li>
-        
-      </ul>
-    </nav>
-  
 </li>
       
         <li class="md-nav__item">
@@ -417,19 +404,6 @@
     Alternatives
   </a>
   
-    <nav class="md-nav" aria-label="Alternatives">
-      <ul class="md-nav__list">
-        
-          <li class="md-nav__item">
-  <a href="#fastapi-jwt-auth" class="md-nav__link">
-    fastapi-jwt-auth
-  </a>
-  
-</li>
-        
-      </ul>
-    </nav>
-  
 </li>
       
         <li class="md-nav__item">
@@ -493,10 +467,18 @@ def read_current_user(
     return {&quot;username&quot;: credentials[&quot;username&quot;], &quot;role&quot;: credentials[&quot;role&quot;]}
 </code></pre>
 <h2 id="alternatives">Alternatives</h2>
-<h3 id="fastapi-jwt-auth"><a href="https://github.com/IndominusByte/fastapi-jwt-auth/">fastapi-jwt-auth</a></h3>
-<p>Nice lib, however 
-* poorly supported 
-* not "fastapi-style" (as native functions parameters)</p>
+<ul>
+<li>FastAPI docs suggest <a href="https://fastapi.tiangolo.com/tutorial/security/oauth2-jwt/">writing it manually</a>, but</li>
+<li>code duplication  </li>
+<li>
+<p>opportunity for bugs</p>
+</li>
+<li>
+<p>There is nice <a href="https://github.com/IndominusByte/fastapi-jwt-auth/">fastapi-jwt-auth</a>, but</p>
+</li>
+<li>poorly supported  </li>
+<li>not "fastapi-style" (not native functions parameters)</li>
+</ul>
 <h2 id="fastapi-integration">FastAPI Integration</h2>
 <p>There it is open and maintained <a href="https://github.com/tiangolo/fastapi/pull/3305">Pull Request #3305</a> to the <code>fastapi</code> repo. Currently, not considered.</p>
 <h2 id="requirements">Requirements</h2>
