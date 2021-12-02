@@ -1,2 +1,61 @@
 # fastapi-jwt
-FastAPI extension for JWT auth
+
+[![Test](https://github.com/k4black/fastapi-jwt/actions/workflows/test.yml/badge.svg)](https://github.com/k4black/fastapi-jwt/actions/workflows/test.yml)
+[![Publish](https://github.com/k4black/fastapi-jwt/actions/workflows/publish.yml/badge.svg)](https://github.com/k4black/fastapi-jwt/actions/workflows/publish.yml)
+[![codecov](https://codecov.io/gh/k4black/fastapi-jwt/branch/master/graph/badge.svg?token=3F9J850FX2)](https://codecov.io/gh/k4black/fastapi-jwt)
+[![pypi](https://img.shields.io/pypi/v/fastapi-jwt)](https://pypi.org/project/fastapi-jwt/)
+
+Native FastAPI extension for JWT auth
+
+---
+
+
+**Documentation:** https://k4black.github.io/fastapi-jwt/  
+**Source Code:** https://github.com/k4black/fastapi-jwt/  
+
+
+## Installation
+```shell
+pip install fastapi-jwt
+```
+
+
+## Usage
+This library made in fastapi style, so it can be used similarly with standard security features 
+
+```python
+app = FastAPI()
+
+
+access_security = JwtAccessBearer(secret_key="secret_key", auto_error=False)
+
+
+@app.post("/auth")
+def auth():
+    subject = {"username": "username", "role": "user"}
+    return {"access_token": access_security.create_access_token(subject=subject)}
+
+
+@app.get("/users/me")
+def read_current_user(
+    credentials: JwtAuthorizationCredentials = Security(access_security),
+):
+    return {"username": credentials["username"], "role": credentials["role"]}
+```
+
+
+## Alternatives 
+
+### [fastapi-jwt-auth](https://github.com/IndominusByte/fastapi-jwt-auth/)
+Nice lib, however 
+* poorly supported 
+* not "fastapi-style" (as native functions parameters)
+
+## FastAPI Integration 
+
+There it is open and maintained [Pull Request #3305](https://github.com/tiangolo/fastapi/pull/3305) to the `fastapi` repo. Currently, not considered.
+
+## Requirements 
+
+* `fastapi`
+* `python-jose[cryptography]`

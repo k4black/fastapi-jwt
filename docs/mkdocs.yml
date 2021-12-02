@@ -1,0 +1,57 @@
+site_name: fastapi-jwt
+site_description: FastAPI extention for JWT auth
+site_url: https://k4black.github.io/fastapi-jwt/
+#docs_dir: ../docs
+docs_dir: ./docs
+#site_dir: ../site
+site_dir: ./site
+
+
+# Repository
+repo_name: k4black/fastapi-jwt
+repo_url: https://github.com/k4black/fastapi-jwt
+edit_uri: ""
+
+
+
+nav:
+    - Home: index.md
+    - User Guide: user_guide.md
+    - Developing: developing.md
+    - Release notes: release-notes.md
+
+
+theme:
+    name: material
+    custom_dir: docs/overrides
+    palette:
+        - media: "(prefers-color-scheme: light)"
+          scheme: slate
+          toggle:
+            icon: material/weather-sunny
+            name: Switch to light mode
+        - media: "(prefers-color-scheme: dark)"
+          scheme: default
+          toggle:
+            icon: material/weather-night
+            name: Switch to dark mode
+    font:
+        text: Roboto
+        code: Roboto Mono
+    icon:
+        repo: fontawesome/brands/github
+    favicon: images/logo-circle.svg
+    logo: images/logo-circle.svg
+
+extra_css:
+    - overrides/main.css
+
+extra:
+  version:
+    provider: mike
+
+plugins:
+    - search
+    - awesome-pages
+    - include-markdown
+    - mike
