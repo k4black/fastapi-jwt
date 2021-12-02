@@ -11,11 +11,6 @@
          <changefreq>daily</changefreq>
     </url>
     <url>
-         <loc>https://k4black.github.io/fastapi-jwt/faq/</loc>
-         <lastmod>2021-12-02</lastmod>
-         <changefreq>daily</changefreq>
-    </url>
-    <url>
          <loc>https://k4black.github.io/fastapi-jwt/release-notes/</loc>
          <lastmod>2021-12-02</lastmod>
          <changefreq>daily</changefreq>
