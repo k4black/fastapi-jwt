@@ -46,10 +46,13 @@ def read_current_user(
 
 ## Alternatives 
 
-### [fastapi-jwt-auth](https://github.com/IndominusByte/fastapi-jwt-auth/)
-Nice lib, however 
-* poorly supported 
-* not "fastapi-style" (as native functions parameters)
+* FastAPI docs suggest [writing it manually](https://fastapi.tiangolo.com/tutorial/security/oauth2-jwt/), but
+  * code duplication  
+  * opportunity for bugs
+
+* There is nice [fastapi-jwt-auth](https://github.com/IndominusByte/fastapi-jwt-auth/), but
+  * poorly supported  
+  * not "fastapi-style" (not native functions parameters)
 
 ## FastAPI Integration 
 
