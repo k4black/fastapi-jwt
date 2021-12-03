@@ -17,29 +17,29 @@ jobs:
   update-verstion-and-chengelog:
     runs-on: ubuntu-latest
     steps:
-    - uses: actions/checkout@v2
-      with:
-        ref: master
-    - name: Update version file
-      run: |
-        cat VERSION
-        echo "VERSION ${{ github.ref_name }}"
-        echo -n "${{ github.ref_name }}" > VERSION
-    - name: Update changelog file
-      run: |
-        echo "CHANGELOG"
-    - name: Commit updated files
-      run: |
-        git config --global user.name "github-actions"
-        git config --global user.email 'github-actions@users.noreply.github.com'
-        git remote set-url origin https://x-access-token:${{ secrets.GITHUB_TOKEN }}@github.com/${{ github.repository }}
-        git add VERSION
-        git commit -m "Automated version update to ${{ github.ref_name }}"
-        git push origin
-    - name: Tag new commit
-      run: |
-        git tag --force ${{ github.ref_name }}
-        git push origin ${{ github.ref_name }} --force
+      - uses: actions/checkout@v2
+        with:
+          ref: master
+      - name: Update version file
+        run: |
+          cat VERSION
+          echo "VERSION ${{ github.ref_name }}"
+          echo -n "${{ github.ref_name }}" > VERSION
+      - name: Update changelog file
+        run: |
+          echo "CHANGELOG"
+      - name: Commit updated files
+        run: |
+          git config --global user.name "github-actions"
+          git config --global user.email 'github-actions@users.noreply.github.com'
+          git remote set-url origin https://x-access-token:${{ secrets.GITHUB_TOKEN }}@github.com/${{ github.repository }}
+          git add VERSION
+          git commit -m "Automated version update to ${{ github.ref_name }}"
+          git push origin
+      - name: Tag new commit
+        run: |
+          git tag --force ${{ github.ref_name }}
+          git push origin ${{ github.ref_name }} --force
 
   update-release-github:
     needs: update-verstion-and-chengelog
@@ -57,27 +57,27 @@ jobs:
     needs: update-verstion-and-chengelog
     runs-on: ubuntu-latest
     steps:
-    - uses: actions/checkout@v2
-      with:
-        ref: ${{ github.ref_name }}
-    - name: Setup Python 3.9
-      uses: actions/setup-python@v2
-      with:
-        python-version: 3.9
-    - name: Build python package
-      run: |
-        cat VERSION
-        python -m pip install wheel twine
-        python -m pip wheel . --no-deps --wheel-dir dist
-        twine upload -u __token__ -p ${{ secrets.PYPI_TOKEN }} dist/*
+      - uses: actions/checkout@v2
+        with:
+          ref: ${{ github.ref_name }}
+      - name: Setup Python 3.9
+        uses: actions/setup-python@v2
+        with:
+          python-version: 3.9
+      - name: Build python package
+        run: |
+          cat VERSION
+          python -m pip install wheel twine
+          python -m pip wheel . --no-deps --wheel-dir dist
+          twine upload -u __token__ -p ${{ secrets.PYPI_TOKEN }} dist/*
 
   release-github-pages:
     needs: update-verstion-and-chengelog
     runs-on: ubuntu-latest
     steps:
-    - uses: actions/checkout@v2
-      with:
-        ref: ${{ github.ref_name }}
+      - uses: actions/checkout@v2
+        with:
+          ref: ${{ github.ref_name }}
       - name: Setup Python 3.9
         uses: actions/setup-python@v2
         with:
