@@ -22,6 +22,7 @@ jobs:
         ref: ${{ github.head_ref }}
     - name: Update version file
       run: |
+        cat VERSION
         echo "VERSION ${{ github.ref_name }}"
         echo -n "${{ github.ref_name }}" > VERSION
     - name: Update changelog file
@@ -32,7 +33,9 @@ jobs:
         git config --global user.name ${{ github.actor }}
         git config --global user.email '${{ github.actor }}@users.noreply.github.com'
         git remote set-url origin https://x-access-token:${{ secrets.GITHUB_TOKEN }}@github.com/${{ github.repository }}
-        git commit -am "Automated version update to ${{ github.event.inputs.version }}"
+        git checkout origin master
+        git add VERSION
+        git commit -m "Automated version update to ${{ github.event.inputs.version }}"
         git push origin
     - name: Tag new commit
       run: |
