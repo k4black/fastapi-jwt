@@ -30,16 +30,11 @@ jobs:
         echo "CHANGELOG"
     - name: Commit updated files
       run: |
-        git config --global user.name ${{ github.actor }}
-        git config --global user.email '${{ github.actor }}@users.noreply.github.com'
+        git config --global user.name "github-actions"
+        git config --global user.email 'github-actions@users.noreply.github.com'
         git remote set-url origin https://x-access-token:${{ secrets.GITHUB_TOKEN }}@github.com/${{ github.repository }}
-        # git branch -b master origin/master || git checkout master
-        git status
-        git remote -v
-        git branch
-        git tag
         git add VERSION
-        git commit -m "Automated version update to ${{ github.event.inputs.version }}"
+        git commit -m "Automated version update to ${{ github.ref_name }}"
         git push origin
     - name: Tag new commit
       run: |
@@ -51,8 +46,11 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v2
+        with:
+          ref: ${{ github.ref_name }}
       - name: Update Release rescription
         run: |
+          echo "VERSION"
           echo "CHANGELOG"
 
   release-python-package:
@@ -60,12 +58,15 @@ jobs:
     runs-on: ubuntu-latest
     steps:
     - uses: actions/checkout@v2
+      with:
+        ref: ${{ github.ref_name }}
     - name: Setup Python 3.9
       uses: actions/setup-python@v2
       with:
         python-version: 3.9
     - name: Build python package
       run: |
+        cat VERSION
         python -m pip install wheel twine
         python -m pip wheel . --no-deps --wheel-dir dist
         twine upload -u __token__ -p ${{ secrets.PYPI_TOKEN }} dist/*
@@ -74,7 +75,9 @@ jobs:
     needs: update-verstion-and-chengelog
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v2
+    - uses: actions/checkout@v2
+      with:
+        ref: ${{ github.ref_name }}
       - name: Setup Python 3.9
         uses: actions/setup-python@v2
         with:
