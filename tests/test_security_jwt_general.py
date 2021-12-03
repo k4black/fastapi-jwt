@@ -1,5 +1,6 @@
 import datetime
 from uuid import uuid1
+from typing import Set
 
 from fastapi import FastAPI, Security
 from fastapi.testclient import TestClient
@@ -13,7 +14,7 @@ access_security = JwtAccessBearer(secret_key="secret_key")
 refresh_security = JwtRefreshBearer(secret_key="secret_key")
 
 
-unique_identifiers_database: set[str] = set()
+unique_identifiers_database: Set[str] = set()
 
 
 @app.post("/auth")
