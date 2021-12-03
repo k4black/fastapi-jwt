@@ -16,9 +16,13 @@ except ImportError:  # pragma: nocover
 
 
 __all__ = [
-    'JwtAuthorizationCredentials',
-    'JwtAccessBearer', 'JwtAccessCookie', 'JwtAccessBearerCookie',
-    'JwtRefreshBearer', 'JwtRefreshCookie', 'JwtRefreshBearerCookie',
+    "JwtAuthorizationCredentials",
+    "JwtAccessBearer",
+    "JwtAccessCookie",
+    "JwtAccessBearerCookie",
+    "JwtRefreshBearer",
+    "JwtRefreshCookie",
+    "JwtRefreshBearerCookie",
 ]
 
 
@@ -101,20 +105,22 @@ class JwtAuthBase(ABC):
                 status_code=HTTP_401_UNAUTHORIZED, detail=f"Wrong token: {e}"
             )
 
-    @staticmethod
     def _generate_payload(
-        subject: Dict[str, Any], expires_delta: timedelta
+        self,
+        subject: Dict[str, Any],
+        expires_delta: timedelta,
+        unique_identifier: str,
+        token_type: str,
     ) -> Dict[str, Any]:
         now = datetime.utcnow()
 
-        to_encode: Dict[str, Any] = {
+        return {
             "subject": subject.copy(),  # main subject
+            "type": token_type,  # 'access' or 'refresh' token
             "exp": now + expires_delta,  # expire time
             "iat": now,  # creation time
-            "jti": str(uuid1()),  # uuid
+            "jti": unique_identifier,  # uuid
         }
-
-        return to_encode
 
     def _get_token(
         self,
@@ -145,10 +151,16 @@ class JwtAuthBase(ABC):
         return payload
 
     def create_access_token(
-        self, subject: Dict[str, Any], expires_delta: Optional[timedelta] = None
+        self,
+        subject: Dict[str, Any],
+        expires_delta: Optional[timedelta] = None,
+        unique_identifier: Optional[str] = None,
     ) -> str:
         expires_delta = expires_delta or self.access_expires_delta
-        to_encode = self._generate_payload(subject, expires_delta)
+        unique_identifier = unique_identifier or str(uuid1())
+        to_encode = self._generate_payload(
+            subject, expires_delta, unique_identifier, "access"
+        )
 
         jwt_encoded: str = jwt.encode(
             to_encode, self.secret_key, algorithm=self.algorithm
@@ -156,13 +168,16 @@ class JwtAuthBase(ABC):
         return jwt_encoded
 
     def create_refresh_token(
-        self, subject: Dict[str, Any], expires_delta: Optional[timedelta] = None
+        self,
+        subject: Dict[str, Any],
+        expires_delta: Optional[timedelta] = None,
+        unique_identifier: Optional[str] = None,
     ) -> str:
         expires_delta = expires_delta or self.refresh_expires_delta
-        to_encode = self._generate_payload(subject, expires_delta)
-
-        # Adding creating refresh token mark
-        to_encode["type"] = "refresh"
+        unique_identifier = unique_identifier or str(uuid1())
+        to_encode = self._generate_payload(
+            subject, expires_delta, unique_identifier, "refresh"
+        )
 
         jwt_encoded: str = jwt.encode(
             to_encode, self.secret_key, algorithm=self.algorithm
@@ -242,7 +257,9 @@ class JwtAccess(JwtAuthBase):
         payload = self._get_payload(bearer, cookie)
 
         if payload:
-            return JwtAuthorizationCredentials(payload["subject"], payload["jti"])
+            return JwtAuthorizationCredentials(
+                payload["subject"], payload.get("jti", None)
+            )
         return None
 
 
@@ -361,7 +378,9 @@ class JwtRefresh(JwtAuthBase):
                 detail="Wrong token: 'type' is not 'refresh'",
             )
 
-        return JwtAuthorizationCredentials(payload["subject"], payload["jti"])
+        return JwtAuthorizationCredentials(
+            payload["subject"], payload.get("jti", None)
+        )
 
 
 class JwtRefreshBearer(JwtRefresh):

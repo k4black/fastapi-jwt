@@ -1,4 +1,5 @@
 import datetime
+from uuid import uuid1
 
 from fastapi import FastAPI, Security
 from fastapi.testclient import TestClient
@@ -12,11 +13,18 @@ access_security = JwtAccessBearer(secret_key="secret_key")
 refresh_security = JwtRefreshBearer(secret_key="secret_key")
 
 
+unique_identifiers_database: set[str] = set()
+
+
 @app.post("/auth")
 def auth():
     subject = {"username": "username", "role": "user"}
+    unique_identifier = str(uuid1())
+    unique_identifiers_database.add(unique_identifier)
 
-    access_token = access_security.create_access_token(subject=subject)
+    access_token = access_security.create_access_token(
+        subject=subject, unique_identifier=unique_identifier
+    )
     refresh_token = access_security.create_refresh_token(subject=subject)
 
     return {"access_token": access_token, "refresh_token": refresh_token}
@@ -24,7 +32,12 @@ def auth():
 
 @app.post("/refresh")
 def refresh(credentials: JwtAuthorizationCredentials = Security(refresh_security)):
-    access_token = refresh_security.create_access_token(subject=credentials.subject)
+    unique_identifier = str(uuid1())
+    unique_identifiers_database.add(unique_identifier)
+
+    access_token = refresh_security.create_access_token(
+        subject=credentials.subject, unique_identifier=unique_identifier,
+    )
     refresh_token = refresh_security.create_refresh_token(subject=credentials.subject)
 
     return {"access_token": access_token, "refresh_token": refresh_token}
@@ -35,6 +48,13 @@ def read_current_user(
     credentials: JwtAuthorizationCredentials = Security(access_security),
 ):
     return {"username": credentials["username"], "role": credentials["role"]}
+
+
+@app.get("/auth/meta")
+def get_token_meta(
+    credentials: JwtAuthorizationCredentials = Security(access_security),
+):
+    return {"jti": credentials.jti}
 
 
 class _FakeDateTimeShort(datetime.datetime):  # pragma: no cover
@@ -98,6 +118,19 @@ openapi_schema = {
                 },
                 "summary": "Read Current User",
                 "operationId": "read_current_user_users_me_get",
+                "security": [{"JwtAccessBearer": []}],
+            }
+        },
+        "/auth/meta": {
+            "get": {
+                "responses": {
+                    "200": {
+                        "description": "Successful Response",
+                        "content": {"application/json": {"schema": {}}},
+                    }
+                },
+                "summary": "Get Token Meta",
+                "operationId": "get_token_meta_auth_meta_get",
                 "security": [{"JwtAccessBearer": []}],
             }
         },
@@ -235,3 +268,13 @@ def test_security_jwt_refresh_token_expired(mocker: MockerFixture):
     assert response.json()["detail"].startswith(
         "Token time expired: Signature has expired"
     )
+
+
+def test_security_jwt_custom_jti():
+    access_token = client.post("/auth").json()["access_token"]
+
+    response = client.get(
+        "/auth/meta", headers={"Authorization": f"Bearer {access_token}"}
+    )
+    assert response.status_code == 200, response.text
+    assert response.json()["jti"] in unique_identifiers_database
