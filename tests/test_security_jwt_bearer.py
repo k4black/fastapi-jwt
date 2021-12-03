@@ -1,10 +1,7 @@
 from fastapi import FastAPI, Security
-from fastapi_jwt import (
-    JwtAccessBearer,
-    JwtAuthorizationCredentials,
-    JwtRefreshBearer,
-)
 from fastapi.testclient import TestClient
+
+from fastapi_jwt import JwtAccessBearer, JwtAuthorizationCredentials, JwtRefreshBearer
 
 app = FastAPI()
 

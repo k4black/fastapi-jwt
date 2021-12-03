@@ -1,13 +1,10 @@
 import datetime
 
 from fastapi import FastAPI, Security
-from fastapi_jwt import (
-    JwtAccessBearer,
-    JwtAuthorizationCredentials,
-    JwtRefreshBearer,
-)
 from fastapi.testclient import TestClient
 from pytest_mock import MockerFixture
+
+from fastapi_jwt import JwtAccessBearer, JwtAuthorizationCredentials, JwtRefreshBearer
 
 app = FastAPI()
 

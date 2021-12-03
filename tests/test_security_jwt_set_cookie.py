@@ -1,6 +1,7 @@
 from fastapi import FastAPI, Response
-from fastapi_jwt import JwtAccessCookie, JwtRefreshCookie
 from fastapi.testclient import TestClient
+
+from fastapi_jwt import JwtAccessCookie, JwtRefreshCookie
 
 app = FastAPI()
 
