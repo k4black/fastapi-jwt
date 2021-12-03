@@ -19,7 +19,7 @@ jobs:
     steps:
     - uses: actions/checkout@v2
       with:
-        ref: ${{ github.head_ref }}
+        ref: master
     - name: Update version file
       run: |
         cat VERSION
@@ -33,7 +33,11 @@ jobs:
         git config --global user.name ${{ github.actor }}
         git config --global user.email '${{ github.actor }}@users.noreply.github.com'
         git remote set-url origin https://x-access-token:${{ secrets.GITHUB_TOKEN }}@github.com/${{ github.repository }}
-        git checkout origin master
+        # git branch -b master origin/master || git checkout master
+        git status
+        git remote -v
+        git branch
+        git tag
         git add VERSION
         git commit -m "Automated version update to ${{ github.event.inputs.version }}"
         git push origin
