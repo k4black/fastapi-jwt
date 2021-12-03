@@ -10,8 +10,16 @@ FastAPI native extension, easy and simple JWT auth
 ---
 
 
-**Documentation:** https://k4black.github.io/fastapi-jwt/  
-**Source Code:** https://github.com/k4black/fastapi-jwt/  
+**Documentation:** [k4black.github.io/fastapi-jwt](https://k4black.github.io/fastapi-jwt/)  
+**Source Code:** [github.com/k4black/fastapi-jwt](https://github.com/k4black/fastapi-jwt/)
+
+
+## Features
+* OpenAPI schema generation 
+* Native integration with FastAPI
+* Access/Refresh JTW
+* JTI
+* Cookie setting
 
 
 ## Installation

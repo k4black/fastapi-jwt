@@ -4,14 +4,7 @@ on:
   release:
     types:
       - created
-#  workflow_run:
-#    workflows: ["Bump Version"]
-#    types: [completed]
-#  push:
-#    # Sequence of patterns matched against refs/tags
-#    tags:
-#      - 'v*.*.*' # i.e. v1.0.0, v20.15.10
-#      - '*.*.*' # i.e. 1.0.0, 20.15.10
+
 
 jobs:
   update-verstion-and-chengelog:
@@ -33,8 +26,8 @@ jobs:
           git config --global user.name 'github-actions'
           git config --global user.email 'github-actions@users.noreply.github.com'
           git remote set-url origin https://x-access-token:${{ secrets.GITHUB_TOKEN }}@github.com/${{ github.repository }}
-          git add VERSION
-          git commit -m "Automated version update to ${{ github.ref_name }}"
+          git add VERSION CHANGELOG.md
+          git commit -m "Auto version and changelog update [${{ github.ref_name }}]"
           git push origin
       - name: Tag new commit
         run: |
@@ -66,7 +59,6 @@ jobs:
           python-version: 3.9
       - name: Build python package
         run: |
-          cat VERSION
           python -m pip install wheel twine
           python -m pip wheel . --no-deps --wheel-dir dist
           twine upload -u __token__ -p ${{ secrets.PYPI_TOKEN }} dist/*
