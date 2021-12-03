@@ -23,6 +23,7 @@ FastAPI native extension, easy and simple JWT auth
 
 
 ## Installation
+You can access package [fastapi-jwt in pypi](https://pypi.org/project/fastapi-jwt/)
 ```shell
 pip install fastapi-jwt
 ```
