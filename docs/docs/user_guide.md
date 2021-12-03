@@ -6,7 +6,7 @@ This library made in fastapi style, so it can be used as standard security featu
 ## Example 
 
 
-```python
+```python 
 from datetime import timedelta
 
 from fastapi import FastAPI, Security, HTTPException

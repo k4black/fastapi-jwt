@@ -50,6 +50,12 @@ extra:
   version:
     provider: mike
 
+markdown_extensions:
+  - pymdownx.highlight
+  - pymdownx.inlinehilite
+  - pymdownx.superfences
+  - pymdownx.snippets
+
 plugins:
     - search
     - awesome-pages

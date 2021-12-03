@@ -17,7 +17,6 @@ P.S. It's hard to say what a Good Code is. Let's say that it should be simple, c
 ```shell
 python -m flake8 .
 python -m mypy fastapi_jwt
-python -m pylint fastapi_jwt  # fails under score 7 
 python -m isort . --check
 ```
 
