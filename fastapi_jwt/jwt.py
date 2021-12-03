@@ -93,17 +93,19 @@ class JwtAuthBase(ABC):
             )
             return payload
         except jwt.ExpiredSignatureError as e:
-            if not self.auto_error:
+            if self.auto_error:
+                raise HTTPException(
+                    status_code=HTTP_401_UNAUTHORIZED, detail=f"Token time expired: {e}"
+                )
+            else:
                 return None
-            raise HTTPException(
-                status_code=HTTP_401_UNAUTHORIZED, detail=f"Token time expired: {e}"
-            )
         except jwt.JWTError as e:
-            if not self.auto_error:
+            if self.auto_error:
+                raise HTTPException(
+                    status_code=HTTP_401_UNAUTHORIZED, detail=f"Wrong token: {e}"
+                )
+            else:
                 return None
-            raise HTTPException(
-                status_code=HTTP_401_UNAUTHORIZED, detail=f"Wrong token: {e}"
-            )
 
     def _generate_payload(
         self,
@@ -140,11 +142,12 @@ class JwtAuthBase(ABC):
 
         # Check token exist
         if refresh_token is None:
-            if not self.auto_error:
+            if self.auto_error:
+                raise HTTPException(
+                    status_code=HTTP_401_UNAUTHORIZED, detail="Credentials are not provided"
+                )
+            else:
                 return None
-            raise HTTPException(
-                status_code=HTTP_401_UNAUTHORIZED, detail="Credentials are not provided"
-            )
 
         # Try to decode jwt token. auto_error on error
         payload = self._decode(refresh_token)
@@ -371,12 +374,13 @@ class JwtRefresh(JwtAuthBase):
             return None
 
         if "type" not in payload or payload["type"] != "refresh":
-            if not self.auto_error:
+            if self.auto_error:
+                raise HTTPException(
+                    status_code=HTTP_401_UNAUTHORIZED,
+                    detail="Wrong token: 'type' is not 'refresh'",
+                )
+            else:
                 return None
-            raise HTTPException(
-                status_code=HTTP_401_UNAUTHORIZED,
-                detail="Wrong token: 'type' is not 'refresh'",
-            )
 
         return JwtAuthorizationCredentials(
             payload["subject"], payload.get("jti", None)
