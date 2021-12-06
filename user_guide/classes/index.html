@@ -10,21 +10,21 @@
       
       
       
-        <link rel="canonical" href="https://k4black.github.io/fastapi-jwt/user_guide/">
+        <link rel="canonical" href="https://k4black.github.io/fastapi-jwt/user_guide/classes/">
       
-      <link rel="icon" href="../images/logo-circle.svg">
-      <meta name="generator" content="mkdocs-1.2.3, mkdocs-material-8.0.3">
+      <link rel="icon" href="../../images/logo-circle.svg">
+      <meta name="generator" content="mkdocs-1.2.3, mkdocs-material-8.0.4">
     
     
       
-        <title>User Guide - fastapi-jwt</title>
+        <title>Classes - fastapi-jwt</title>
       
     
     
-      <link rel="stylesheet" href="../assets/stylesheets/main.62128196.min.css">
+      <link rel="stylesheet" href="../../assets/stylesheets/main.2a4617e2.min.css">
       
         
-        <link rel="stylesheet" href="../assets/stylesheets/palette.9204c3b2.min.css">
+        <link rel="stylesheet" href="../../assets/stylesheets/palette.9204c3b2.min.css">
         
       
     
@@ -38,9 +38,9 @@
       
     
     
-      <link rel="stylesheet" href="../overrides/main.css">
+      <link rel="stylesheet" href="../../overrides/main.css">
     
-    <script>function __md_scope(e,t,_){return new URL(_||(t===localStorage?"..":".."),location).pathname+"."+e}function __md_get(e,t=localStorage,_){return JSON.parse(t.getItem(__md_scope(e,t,_)))}function __md_set(e,t,_=localStorage,o){try{_.setItem(__md_scope(e,_,o),JSON.stringify(t))}catch(e){}}</script>
+    <script>function __md_scope(e,t,_){return new URL(_||(t===localStorage?"../..":"../.."),location).pathname+"."+e}function __md_get(e,t=localStorage,_){return JSON.parse(t.getItem(__md_scope(e,t,_)))}function __md_set(e,t,_=localStorage,o){try{_.setItem(__md_scope(e,_,o),JSON.stringify(t))}catch(e){}}</script>
     
       
 
@@ -68,7 +68,7 @@
     <div data-md-component="skip">
       
         
-        <a href="#user-guide" class="md-skip">
+        <a href="#classes" class="md-skip">
           Skip to content
         </a>
       
@@ -88,9 +88,9 @@
 
 <header class="md-header" data-md-component="header">
   <nav class="md-header__inner md-grid" aria-label="Header">
-    <a href=".." title="fastapi-jwt" class="md-header__button md-logo" aria-label="fastapi-jwt" data-md-component="logo">
+    <a href="../.." title="fastapi-jwt" class="md-header__button md-logo" aria-label="fastapi-jwt" data-md-component="logo">
       
-  <img src="../images/logo-circle.svg" alt="logo">
+  <img src="../../images/logo-circle.svg" alt="logo">
 
     </a>
     <label class="md-header__button md-icon" for="__drawer">
@@ -106,7 +106,7 @@
         <div class="md-header__topic" data-md-component="header-topic">
           <span class="md-ellipsis">
             
-              User Guide
+              Classes
             
           </span>
         </div>
@@ -207,9 +207,9 @@
 
 <nav class="md-nav md-nav--primary" aria-label="Navigation" data-md-level="0">
   <label class="md-nav__title" for="__drawer">
-    <a href=".." title="fastapi-jwt" class="md-nav__button md-logo" aria-label="fastapi-jwt" data-md-component="logo">
+    <a href="../.." title="fastapi-jwt" class="md-nav__button md-logo" aria-label="fastapi-jwt" data-md-component="logo">
       
-  <img src="../images/logo-circle.svg" alt="logo">
+  <img src="../../images/logo-circle.svg" alt="logo">
 
     </a>
     fastapi-jwt
@@ -237,7 +237,7 @@
   
   
     <li class="md-nav__item">
-      <a href=".." class="md-nav__link">
+      <a href="../.." class="md-nav__link">
         Home
       </a>
     </li>
@@ -253,6 +253,34 @@
     
   
   
+    
+    <li class="md-nav__item md-nav__item--active md-nav__item--nested">
+      
+      
+        <input class="md-nav__toggle md-toggle" data-md-toggle="__nav_2" type="checkbox" id="__nav_2" checked>
+      
+      
+      
+      
+        <label class="md-nav__link" for="__nav_2">
+          User Guide
+          <span class="md-nav__icon md-icon"></span>
+        </label>
+      
+      <nav class="md-nav" aria-label="User Guide" data-md-level="1">
+        <label class="md-nav__title" for="__nav_2">
+          <span class="md-nav__icon md-icon"></span>
+          User Guide
+        </label>
+        <ul class="md-nav__list" data-md-scrollfix>
+          
+            
+              
+  
+  
+    
+  
+  
     <li class="md-nav__item md-nav__item--active">
       
       <input class="md-nav__toggle md-toggle" data-md-toggle="toc" type="checkbox" id="__toc">
@@ -262,12 +290,12 @@
       
       
         <label class="md-nav__link md-nav__link--active" for="__toc">
-          User Guide
+          Classes
           <span class="md-nav__icon md-icon"></span>
         </label>
       
       <a href="./" class="md-nav__link md-nav__link--active">
-        User Guide
+        Classes
       </a>
       
         
@@ -286,9 +314,43 @@
     <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
       
         <li class="md-nav__item">
-  <a href="#example" class="md-nav__link">
-    Example
+  <a href="#security-classes" class="md-nav__link">
+    Security classes
   </a>
+  
+    <nav class="md-nav" aria-label="Security classes">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#credentials" class="md-nav__link">
+    Credentials
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#access-tokens" class="md-nav__link">
+    Access tokens
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#refresh-tokens" class="md-nav__link">
+    Refresh tokens
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#create" class="md-nav__link">
+    Create
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
   
 </li>
       
@@ -296,6 +358,27 @@
   
 </nav>
       
+    </li>
+  
+
+            
+          
+            
+              
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../examples/" class="md-nav__link">
+        Examples
+      </a>
+    </li>
+  
+
+            
+          
+        </ul>
+      </nav>
     </li>
   
 
@@ -308,7 +391,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../developing/" class="md-nav__link">
+      <a href="../../developing/" class="md-nav__link">
         Developing
       </a>
     </li>
@@ -323,7 +406,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../release-notes/" class="md-nav__link">
+      <a href="../../release-notes/" class="md-nav__link">
         Release notes
       </a>
     </li>
@@ -357,9 +440,43 @@
     <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
       
         <li class="md-nav__item">
-  <a href="#example" class="md-nav__link">
-    Example
+  <a href="#security-classes" class="md-nav__link">
+    Security classes
   </a>
+  
+    <nav class="md-nav" aria-label="Security classes">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#credentials" class="md-nav__link">
+    Credentials
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#access-tokens" class="md-nav__link">
+    Access tokens
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#refresh-tokens" class="md-nav__link">
+    Refresh tokens
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#create" class="md-nav__link">
+    Create
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
   
 </li>
       
@@ -376,70 +493,49 @@
               
                 
 
-<h1 id="user-guide">User guide</h1>
+<h1 id="classes">Classes</h1>
 <p>This library made in fastapi style, so it can be used as standard security features </p>
-<h2 id="example">Example</h2>
-<div class="highlight"><pre><span></span><code><span class="kn">from</span> <span class="nn">datetime</span> <span class="kn">import</span> <span class="n">timedelta</span>
-
-<span class="kn">from</span> <span class="nn">fastapi</span> <span class="kn">import</span> <span class="n">FastAPI</span><span class="p">,</span> <span class="n">Security</span><span class="p">,</span> <span class="n">HTTPException</span>
-<span class="kn">from</span> <span class="nn">fastapi_jwt</span> <span class="kn">import</span> <span class="p">(</span>
-    <span class="n">JwtAccessBearerCookie</span><span class="p">,</span>
-    <span class="n">JwtAuthorizationCredentials</span><span class="p">,</span>
-    <span class="n">JwtRefreshBearer</span><span class="p">,</span>
-<span class="p">)</span>
-
-
-<span class="n">app</span> <span class="o">=</span> <span class="n">FastAPI</span><span class="p">()</span>
-
-
-<span class="c1"># Read access token from bearer header and cookie (bearer priority)</span>
+<h2 id="security-classes">Security classes</h2>
+<h4 id="credentials">Credentials</h4>
+<ul>
+<li><code>JwtAuthorizationCredentials</code> - universal credentials for access and refresh tokens.<br />
+    Provide access to subject and unique token identifier (jti)
+    <div class="highlight"><pre><span></span><code><span class="k">def</span> <span class="nf">foo</span><span class="p">(</span><span class="n">credentials</span><span class="p">:</span> <span class="n">JwtAuthorizationCredentials</span> <span class="o">=</span> <span class="n">Security</span><span class="p">(</span><span class="n">access_security</span><span class="p">)):</span>
+    <span class="k">return</span> <span class="n">credentials</span><span class="p">[</span><span class="s2">&quot;username&quot;</span><span class="p">],</span> <span class="n">credentials</span><span class="o">.</span><span class="n">jti</span>
+</code></pre></div></li>
+</ul>
+<h4 id="access-tokens">Access tokens</h4>
+<ul>
+<li><code>JwtAccessBearer</code> - read access token from bearer header only</li>
+<li><code>JwtAccessCookie</code> - read access token from cookies only</li>
+<li><code>JwtAccessBearerCookie</code> - read access token from both bearer and cookie</li>
+</ul>
+<h4 id="refresh-tokens">Refresh tokens</h4>
+<ul>
+<li><code>JwtRefreshBearer</code> - read access token from bearer header only</li>
+<li><code>JwtRefreshCookie</code> - read access token from cookies only</li>
+<li><code>JwtRefreshBearerCookie</code> - read access token from both bearer and cookie</li>
+</ul>
+<h3 id="create">Create</h3>
+<p>You can create <code>access_security</code> / <code>refresh_security</code> in multiple ways 
+<div class="highlight"><pre><span></span><code><span class="c1"># Manually</span>
 <span class="n">access_security</span> <span class="o">=</span> <span class="n">JwtAccessBearerCookie</span><span class="p">(</span>
-    <span class="n">secret_key</span><span class="o">=</span><span class="s2">&quot;secret_key&quot;</span><span class="p">,</span>
-    <span class="n">auto_error</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
-    <span class="n">access_expires_delta</span><span class="o">=</span><span class="n">timedelta</span><span class="p">(</span><span class="n">hours</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span>  <span class="c1"># change access token validation timedelta</span>
-<span class="p">)</span>
-<span class="c1"># Read refresh token from bearer header only</span>
-<span class="n">refresh_security</span> <span class="o">=</span> <span class="n">JwtRefreshBearer</span><span class="p">(</span>
-    <span class="n">secret_key</span><span class="o">=</span><span class="s2">&quot;secret_key&quot;</span><span class="p">,</span> 
-    <span class="n">auto_error</span><span class="o">=</span><span class="kc">True</span>  <span class="c1"># automatically raise HTTPException: HTTP_401_UNAUTHORIZED </span>
+    <span class="n">secret_key</span><span class="o">=</span><span class="s2">&quot;other_secret_key&quot;</span><span class="p">,</span>
+    <span class="n">auto_error</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
+    <span class="n">access_expires_delta</span><span class="o">=</span><span class="n">timedelta</span><span class="p">(</span><span class="n">hours</span><span class="o">=</span><span class="mi">1</span><span class="p">),</span>  <span class="c1"># custom access token valid timedelta</span>
+    <span class="n">refresh_expires_delta</span><span class="o">=</span><span class="n">timedelta</span><span class="p">(</span><span class="n">days</span><span class="o">=</span><span class="mi">1</span><span class="p">),</span>  <span class="c1"># custom access token valid timedelta</span>
 <span class="p">)</span>
 
+<span class="c1"># Create from another object, copy all params</span>
+<span class="n">refresh_security</span> <span class="o">=</span> <span class="n">JwtRefreshBearer</span><span class="o">.</span><span class="n">from_other</span><span class="p">(</span><span class="n">access_security</span><span class="p">)</span>
 
-<span class="nd">@app</span><span class="o">.</span><span class="n">post</span><span class="p">(</span><span class="s2">&quot;/auth&quot;</span><span class="p">)</span>
-<span class="k">def</span> <span class="nf">auth</span><span class="p">():</span>
-    <span class="c1"># subject (actual payload) is any json-able python dict</span>
-    <span class="n">subject</span> <span class="o">=</span> <span class="p">{</span><span class="s2">&quot;username&quot;</span><span class="p">:</span> <span class="s2">&quot;username&quot;</span><span class="p">,</span> <span class="s2">&quot;role&quot;</span><span class="p">:</span> <span class="s2">&quot;user&quot;</span><span class="p">}</span>
-
-    <span class="c1"># Create new access/refresh tokens pair</span>
-    <span class="n">access_token</span> <span class="o">=</span> <span class="n">access_security</span><span class="o">.</span><span class="n">create_access_token</span><span class="p">(</span><span class="n">subject</span><span class="o">=</span><span class="n">subject</span><span class="p">)</span>
-    <span class="n">refresh_token</span> <span class="o">=</span> <span class="n">refresh_security</span><span class="o">.</span><span class="n">create_refresh_token</span><span class="p">(</span><span class="n">subject</span><span class="o">=</span><span class="n">subject</span><span class="p">)</span>
-
-    <span class="k">return</span> <span class="p">{</span><span class="s2">&quot;access_token&quot;</span><span class="p">:</span> <span class="n">access_token</span><span class="p">,</span> <span class="s2">&quot;refresh_token&quot;</span><span class="p">:</span> <span class="n">refresh_token</span><span class="p">}</span>
-
-
-<span class="nd">@app</span><span class="o">.</span><span class="n">post</span><span class="p">(</span><span class="s2">&quot;/refresh&quot;</span><span class="p">)</span>
-<span class="k">def</span> <span class="nf">refresh</span><span class="p">(</span>
-        <span class="n">credentials</span><span class="p">:</span> <span class="n">JwtAuthorizationCredentials</span> <span class="o">=</span> <span class="n">Security</span><span class="p">(</span><span class="n">refresh_security</span><span class="p">)</span>
-<span class="p">):</span>
-    <span class="c1"># Update access/refresh tokens pair</span>
-    <span class="c1"># We can customize expires_delta when creating</span>
-    <span class="n">access_token</span> <span class="o">=</span> <span class="n">access_security</span><span class="o">.</span><span class="n">create_access_token</span><span class="p">(</span><span class="n">subject</span><span class="o">=</span><span class="n">credentials</span><span class="o">.</span><span class="n">subject</span><span class="p">)</span>
-    <span class="n">refresh_token</span> <span class="o">=</span> <span class="n">refresh_security</span><span class="o">.</span><span class="n">create_refresh_token</span><span class="p">(</span><span class="n">subject</span><span class="o">=</span><span class="n">credentials</span><span class="o">.</span><span class="n">subject</span><span class="p">,</span> <span class="n">expires_delta</span><span class="o">=</span><span class="n">timedelta</span><span class="p">(</span><span class="n">days</span><span class="o">=</span><span class="mi">2</span><span class="p">))</span>
-
-    <span class="k">return</span> <span class="p">{</span><span class="s2">&quot;access_token&quot;</span><span class="p">:</span> <span class="n">access_token</span><span class="p">,</span> <span class="s2">&quot;refresh_token&quot;</span><span class="p">:</span> <span class="n">refresh_token</span><span class="p">}</span>
-
-
-<span class="nd">@app</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;/users/me&quot;</span><span class="p">)</span>
-<span class="k">def</span> <span class="nf">read_current_user</span><span class="p">(</span>
-        <span class="n">credentials</span><span class="p">:</span> <span class="n">JwtAuthorizationCredentials</span> <span class="o">=</span> <span class="n">Security</span><span class="p">(</span><span class="n">access_security</span><span class="p">)</span>
-<span class="p">):</span>  
-    <span class="c1"># auto_error=False, fo we should check manually</span>
-    <span class="k">if</span> <span class="ow">not</span> <span class="n">credentials</span><span class="p">:</span>
-        <span class="k">raise</span> <span class="n">HTTPException</span><span class="p">(</span><span class="n">status_code</span><span class="o">=</span><span class="mi">401</span><span class="p">,</span> <span class="n">detail</span><span class="o">=</span><span class="s1">&#39;my-custom-details&#39;</span><span class="p">)</span>
-
-    <span class="c1"># now we can access Credentials object</span>
-    <span class="k">return</span> <span class="p">{</span><span class="s2">&quot;username&quot;</span><span class="p">:</span> <span class="n">credentials</span><span class="p">[</span><span class="s2">&quot;username&quot;</span><span class="p">],</span> <span class="s2">&quot;role&quot;</span><span class="p">:</span> <span class="n">credentials</span><span class="p">[</span><span class="s2">&quot;role&quot;</span><span class="p">]}</span>
-</code></pre></div>
+<span class="c1"># Create from another object, rewrite some params</span>
+<span class="n">other_access_security</span> <span class="o">=</span> <span class="n">JwtAccessCookie</span><span class="o">.</span><span class="n">from_other</span><span class="p">(</span>
+    <span class="n">access_security</span><span class="p">,</span> 
+    <span class="n">secret_key</span><span class="o">=</span><span class="s1">&#39;!key!&#39;</span><span class="p">,</span> 
+    <span class="n">auto_error</span><span class="o">=</span><span class="kc">False</span>
+<span class="p">)</span>
+</code></pre></div></p>
 
               
             </article>
@@ -453,7 +549,7 @@
     <nav class="md-footer__inner md-grid" aria-label="Footer">
       
         
-        <a href=".." class="md-footer__link md-footer__link--prev" aria-label="Previous: Home" rel="prev">
+        <a href="../.." class="md-footer__link md-footer__link--prev" aria-label="Previous: Home" rel="prev">
           <div class="md-footer__button md-icon">
             <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M20 11v2H8l5.5 5.5-1.42 1.42L4.16 12l7.92-7.92L13.5 5.5 8 11h12z"/></svg>
           </div>
@@ -469,13 +565,13 @@
       
       
         
-        <a href="../developing/" class="md-footer__link md-footer__link--next" aria-label="Next: Developing" rel="next">
+        <a href="../examples/" class="md-footer__link md-footer__link--next" aria-label="Next: Examples" rel="next">
           <div class="md-footer__title">
             <div class="md-ellipsis">
               <span class="md-footer__direction">
                 Next
               </span>
-              Developing
+              Examples
             </div>
           </div>
           <div class="md-footer__button md-icon">
@@ -505,10 +601,10 @@
     <div class="md-dialog" data-md-component="dialog">
       <div class="md-dialog__inner md-typeset"></div>
     </div>
-    <script id="__config" type="application/json">{"base": "..", "features": [], "translations": {"clipboard.copy": "Copy to clipboard", "clipboard.copied": "Copied to clipboard", "search.config.lang": "en", "search.config.pipeline": "trimmer, stopWordFilter", "search.config.separator": "[\\s\\-]+", "search.placeholder": "Search", "search.result.placeholder": "Type to start searching", "search.result.none": "No matching documents", "search.result.one": "1 matching document", "search.result.other": "# matching documents", "search.result.more.one": "1 more on this page", "search.result.more.other": "# more on this page", "search.result.term.missing": "Missing", "select.version.title": "Select version"}, "search": "../assets/javascripts/workers/search.01824240.min.js", "version": {"provider": "mike"}}</script>
+    <script id="__config" type="application/json">{"base": "../..", "features": [], "translations": {"clipboard.copy": "Copy to clipboard", "clipboard.copied": "Copied to clipboard", "search.config.lang": "en", "search.config.pipeline": "trimmer, stopWordFilter", "search.config.separator": "[\\s\\-]+", "search.placeholder": "Search", "search.result.placeholder": "Type to start searching", "search.result.none": "No matching documents", "search.result.one": "1 matching document", "search.result.other": "# matching documents", "search.result.more.one": "1 more on this page", "search.result.more.other": "# more on this page", "search.result.term.missing": "Missing", "select.version.title": "Select version"}, "search": "../../assets/javascripts/workers/search.ca141e46.min.js", "version": {"provider": "mike"}}</script>
     
     
-      <script src="../assets/javascripts/bundle.e0abf5b0.min.js"></script>
+      <script src="../../assets/javascripts/bundle.6baa0517.min.js"></script>
       
     
   </body>
