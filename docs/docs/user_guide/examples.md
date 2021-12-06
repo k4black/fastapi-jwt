@@ -1,9 +1,9 @@
-# User guide 
+# Examples
 
 This library made in fastapi style, so it can be used as standard security features 
 
 
-## Example 
+## Full Example 
 
 
 ```python 

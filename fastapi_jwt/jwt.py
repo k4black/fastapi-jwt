@@ -1,7 +1,7 @@
 from abc import ABC
 from datetime import datetime, timedelta
 from typing import Any, Dict, Optional, Set
-from uuid import uuid1
+from uuid import uuid4
 
 from fastapi.exceptions import HTTPException
 from fastapi.param_functions import Security
@@ -83,6 +83,24 @@ class JwtAuthBase(ABC):
         self.access_expires_delta = access_expires_delta or timedelta(minutes=15)
         self.refresh_expires_delta = refresh_expires_delta or timedelta(days=31)
 
+    @classmethod
+    def from_other(
+        cls,
+        other: 'JwtAuthBase',
+        secret_key: Optional[str] = None,
+        auto_error: Optional[bool] = None,
+        algorithm: Optional[str] = None,
+        access_expires_delta: Optional[timedelta] = None,
+        refresh_expires_delta: Optional[timedelta] = None,
+    ) -> 'JwtAuthBase':
+        return cls(
+            secret_key=secret_key or other.secret_key,
+            auto_error=auto_error or other.auto_error,
+            algorithm=algorithm or other.algorithm,
+            access_expires_delta=access_expires_delta or other.access_expires_delta,
+            refresh_expires_delta=refresh_expires_delta or other.refresh_expires_delta,
+        )
+
     def _decode(self, token: str) -> Optional[Dict[str, Any]]:
         try:
             payload: Dict[str, Any] = jwt.decode(
@@ -124,24 +142,17 @@ class JwtAuthBase(ABC):
             "jti": unique_identifier,  # uuid
         }
 
-    def _get_token(
-        self,
-        bearer: Optional[HTTPBearer] = None,
-        cookie: Optional[APIKeyCookie] = None,
-    ) -> Optional[str]:
-        if bearer:
-            return str(bearer.credentials)  # type: ignore
-        if cookie:
-            return str(cookie)
-        return None
-
-    def _get_payload(
+    async def _get_payload(
         self, bearer: Optional[HTTPBearer], cookie: Optional[APIKeyCookie]
     ) -> Optional[Dict[str, Any]]:
-        refresh_token = self._get_token(bearer, cookie)  # TODO: del function
+        token: Optional[str] = None
+        if bearer:
+            token = str(bearer.credentials)  # type: ignore
+        elif cookie:
+            token = str(cookie)
 
         # Check token exist
-        if refresh_token is None:
+        if not token:
             if self.auto_error:
                 raise HTTPException(
                     status_code=HTTP_401_UNAUTHORIZED, detail="Credentials are not provided"
@@ -150,7 +161,7 @@ class JwtAuthBase(ABC):
                 return None
 
         # Try to decode jwt token. auto_error on error
-        payload = self._decode(refresh_token)
+        payload = self._decode(token)
         return payload
 
     def create_access_token(
@@ -160,7 +171,7 @@ class JwtAuthBase(ABC):
         unique_identifier: Optional[str] = None,
     ) -> str:
         expires_delta = expires_delta or self.access_expires_delta
-        unique_identifier = unique_identifier or str(uuid1())
+        unique_identifier = unique_identifier or str(uuid4())
         to_encode = self._generate_payload(
             subject, expires_delta, unique_identifier, "access"
         )
@@ -177,7 +188,7 @@ class JwtAuthBase(ABC):
         unique_identifier: Optional[str] = None,
     ) -> str:
         expires_delta = expires_delta or self.refresh_expires_delta
-        unique_identifier = unique_identifier or str(uuid1())
+        unique_identifier = unique_identifier or str(uuid4())
         to_encode = self._generate_payload(
             subject, expires_delta, unique_identifier, "refresh"
         )
@@ -252,12 +263,12 @@ class JwtAccess(JwtAuthBase):
             refresh_expires_delta=refresh_expires_delta,
         )
 
-    def _get_credentials(
+    async def _get_credentials(
         self,
         bearer: Optional[JwtAuthBase.JwtAccessBearer],
         cookie: Optional[JwtAuthBase.JwtAccessCookie],
     ) -> Optional[JwtAuthorizationCredentials]:
-        payload = self._get_payload(bearer, cookie)
+        payload = await self._get_payload(bearer, cookie)
 
         if payload:
             return JwtAuthorizationCredentials(
@@ -284,10 +295,10 @@ class JwtAccessBearer(JwtAccess):
             refresh_expires_delta=refresh_expires_delta,
         )
 
-    def __call__(
+    async def __call__(
         self, bearer: JwtAuthBase.JwtAccessBearer = Security(JwtAccess._bearer)
     ) -> Optional[JwtAuthorizationCredentials]:
-        return self._get_credentials(bearer=bearer, cookie=None)
+        return await self._get_credentials(bearer=bearer, cookie=None)
 
 
 class JwtAccessCookie(JwtAccess):
@@ -308,11 +319,11 @@ class JwtAccessCookie(JwtAccess):
             refresh_expires_delta=refresh_expires_delta,
         )
 
-    def __call__(
+    async def __call__(
         self,
         cookie: JwtAuthBase.JwtAccessCookie = Security(JwtAccess._cookie),
     ) -> Optional[JwtAuthorizationCredentials]:
-        return self._get_credentials(bearer=None, cookie=cookie)
+        return await self._get_credentials(bearer=None, cookie=cookie)
 
 
 class JwtAccessBearerCookie(JwtAccess):
@@ -333,12 +344,12 @@ class JwtAccessBearerCookie(JwtAccess):
             refresh_expires_delta=refresh_expires_delta,
         )
 
-    def __call__(
+    async def __call__(
         self,
         bearer: JwtAuthBase.JwtAccessBearer = Security(JwtAccess._bearer),
         cookie: JwtAuthBase.JwtAccessCookie = Security(JwtAccess._cookie),
     ) -> Optional[JwtAuthorizationCredentials]:
-        return self._get_credentials(bearer=bearer, cookie=cookie)
+        return await self._get_credentials(bearer=bearer, cookie=cookie)
 
 
 class JwtRefresh(JwtAuthBase):
@@ -363,12 +374,12 @@ class JwtRefresh(JwtAuthBase):
             refresh_expires_delta=refresh_expires_delta,
         )
 
-    def _get_credentials(
+    async def _get_credentials(
         self,
         bearer: Optional[JwtAuthBase.JwtRefreshBearer],
         cookie: Optional[JwtAuthBase.JwtRefreshCookie],
     ) -> Optional[JwtAuthorizationCredentials]:
-        payload = self._get_payload(bearer, cookie)
+        payload = await self._get_payload(bearer, cookie)
 
         if payload is None:
             return None
@@ -405,10 +416,10 @@ class JwtRefreshBearer(JwtRefresh):
             refresh_expires_delta=refresh_expires_delta,
         )
 
-    def __call__(
+    async def __call__(
         self, bearer: JwtAuthBase.JwtRefreshBearer = Security(JwtRefresh._bearer)
     ) -> Optional[JwtAuthorizationCredentials]:
-        return self._get_credentials(bearer=bearer, cookie=None)
+        return await self._get_credentials(bearer=bearer, cookie=None)
 
 
 class JwtRefreshCookie(JwtRefresh):
@@ -429,11 +440,11 @@ class JwtRefreshCookie(JwtRefresh):
             refresh_expires_delta=refresh_expires_delta,
         )
 
-    def __call__(
+    async def __call__(
         self,
         cookie: JwtAuthBase.JwtRefreshCookie = Security(JwtRefresh._cookie),
     ) -> Optional[JwtAuthorizationCredentials]:
-        return self._get_credentials(bearer=None, cookie=cookie)
+        return await self._get_credentials(bearer=None, cookie=cookie)
 
 
 class JwtRefreshBearerCookie(JwtRefresh):
@@ -454,9 +465,9 @@ class JwtRefreshBearerCookie(JwtRefresh):
             refresh_expires_delta=refresh_expires_delta,
         )
 
-    def __call__(
+    async def __call__(
         self,
         bearer: JwtAuthBase.JwtRefreshBearer = Security(JwtRefresh._bearer),
         cookie: JwtAuthBase.JwtRefreshCookie = Security(JwtRefresh._cookie),
     ) -> Optional[JwtAuthorizationCredentials]:
-        return self._get_credentials(bearer=bearer, cookie=cookie)
+        return await self._get_credentials(bearer=bearer, cookie=cookie)

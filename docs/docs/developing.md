@@ -2,7 +2,7 @@
 
 Install dev dependencies 
 ```shell
-python -m pip install .[docs]  # \[docs\] in zsh
+python -m pip install .[docs,test]  # \[docs,test\] in zsh
 ```
 
 
@@ -69,11 +69,11 @@ Edit it in `docs/`
 mkdocs serve --config-file docs/mkdocs.yml
 ```
 
-Note: Server will auto-restart for all changed `docs/*` files. 
+Note: Server will auto-restart for all changed `docs/*` files.  
 If you want to edit `README.md` or `CONTRIBUTING.md` you should restart server on each change.  
 
 
-### Building (`TODO`)
+### Building pkg docs (`TODO`)
 
 Add python backend docs `TODO`
 ```shell

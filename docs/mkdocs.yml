@@ -16,7 +16,9 @@ edit_uri: ""
 
 nav:
     - Home: index.md
-    - User Guide: user_guide.md
+    - User Guide:
+        - Classes: user_guide/classes.md
+        - Examples: user_guide/examples.md
     - Developing: developing.md
     - Release notes: release-notes.md
 

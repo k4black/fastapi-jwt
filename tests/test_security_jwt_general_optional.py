@@ -1,5 +1,5 @@
 import datetime
-from uuid import uuid1
+from uuid import uuid4
 from typing import Optional, Set
 
 from fastapi import FastAPI, Security
@@ -11,7 +11,7 @@ from fastapi_jwt import JwtAccessBearer, JwtAuthorizationCredentials, JwtRefresh
 app = FastAPI()
 
 access_security = JwtAccessBearer(secret_key="secret_key", auto_error=False)
-refresh_security = JwtRefreshBearer(secret_key="secret_key", auto_error=False)
+refresh_security = JwtRefreshBearer.from_other(access_security)
 
 
 unique_identifiers_database: Set[str] = set()
@@ -20,7 +20,7 @@ unique_identifiers_database: Set[str] = set()
 @app.post("/auth")
 def auth():
     subject = {"username": "username", "role": "user"}
-    unique_identifier = str(uuid1())
+    unique_identifier = str(uuid4())
     unique_identifiers_database.add(unique_identifier)
 
     access_token = access_security.create_access_token(
@@ -38,7 +38,7 @@ def refresh(
     if credentials is None:
         return {"msg": "Create an account first"}
 
-    unique_identifier = str(uuid1())
+    unique_identifier = str(uuid4())
     unique_identifiers_database.add(unique_identifier)
 
     access_token = refresh_security.create_access_token(
