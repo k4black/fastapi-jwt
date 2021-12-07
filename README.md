@@ -17,7 +17,7 @@ FastAPI native extension, easy and simple JWT auth
 ## Features
 * OpenAPI schema generation 
 * Native integration with FastAPI
-* Access/Refresh JTW
+* Access/Refresh JWT
 * JTI
 * Cookie setting
 
