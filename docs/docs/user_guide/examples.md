@@ -61,7 +61,7 @@ def refresh(
 def read_current_user(
         credentials: JwtAuthorizationCredentials = Security(access_security)
 ):  
-    # auto_error=False, fo we should check manually
+    # auto_error=False, so we should check manually
     if not credentials:
         raise HTTPException(status_code=401, detail='my-custom-details')
     
