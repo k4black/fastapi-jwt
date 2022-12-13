@@ -33,7 +33,7 @@ pip install fastapi-jwt
 This library made in fastapi style, so it can be used as standard security features 
 
 ```python
-from fastapi import FastAPI, Security
+from fastapi import FastAPI, Security, Response
 from fastapi_jwt import JwtAuthorizationCredentials, JwtAccessBearer
 
 
@@ -45,6 +45,14 @@ access_security = JwtAccessBearer(secret_key="secret_key", auto_error=True)
 def auth():
     subject = {"username": "username", "role": "user"}
     return {"access_token": access_security.create_access_token(subject=subject)}
+
+
+@app.post("/auth_cookie")
+def auth(response: Response):
+    subject = {"username": "username", "role": "user"}
+    access_token = access_security.create_access_token(subject=subject)
+    access_security.set_access_cookie(response, access_token)
+    return {"access_token": access_token}
 
 
 @app.get("/users/me")
