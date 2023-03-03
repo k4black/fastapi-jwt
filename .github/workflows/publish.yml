@@ -10,7 +10,7 @@ jobs:
   update-version-and-changelog:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v2
+      - uses: actions/checkout@v3
         with:
           ref: master
       - name: Update version file
@@ -35,10 +35,10 @@ jobs:
           git push origin ${{ github.ref_name }} --force
 
   update-release-github:
-    needs: update-version-and-chengelog
+    needs: update-version-and-changelog
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v2
+      - uses: actions/checkout@v3
         with:
           ref: ${{ github.ref_name }}
       - name: Update Release description
@@ -50,11 +50,11 @@ jobs:
     needs: update-version-and-changelog
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v2
+      - uses: actions/checkout@v3
         with:
           ref: ${{ github.ref_name }}
       - name: Setup Python 3.11
-        uses: actions/setup-python@v2
+        uses: actions/setup-python@v4
         with:
           python-version: 3.11
       - name: Build python package
@@ -67,19 +67,19 @@ jobs:
     needs: update-version-and-changelog
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v2
+      - uses: actions/checkout@v3
         with:
           ref: ${{ github.ref_name }}
       - name: Setup Python 3.11
-        uses: actions/setup-python@v2
+        uses: actions/setup-python@v4
         with:
           python-version: 3.11
-      - uses: actions/cache@v2
+      - uses: actions/cache@v3
         with:
           path: ${{ env.pythonLocation }}
-          key: ${{ runner.os }}-python-3.9-${{ env.pythonLocation }}-${{ hashFiles('pyproject.toml', 'setup.cfg') }}-docs
+          key: ${{ runner.os }}-python-3.11-${{ env.pythonLocation }}-${{ hashFiles('pyproject.toml', 'setup.cfg') }}-docs
           restore-keys: |
-            ${{ runner.os }}-python-3.9-
+            ${{ runner.os }}-python-3.11-
             ${{ runner.os }}-python-
             ${{ runner.os }}-
       - name: Install dependencies
