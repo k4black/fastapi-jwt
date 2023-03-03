@@ -7,7 +7,7 @@ on:
 
 
 jobs:
-  update-verstion-and-chengelog:
+  update-version-and-changelog:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v2
@@ -35,28 +35,28 @@ jobs:
           git push origin ${{ github.ref_name }} --force
 
   update-release-github:
-    needs: update-verstion-and-chengelog
+    needs: update-version-and-chengelog
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v2
         with:
           ref: ${{ github.ref_name }}
-      - name: Update Release rescription
+      - name: Update Release description
         run: |
           echo "VERSION"
           echo "CHANGELOG"
 
   release-python-package:
-    needs: update-verstion-and-chengelog
+    needs: update-version-and-changelog
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v2
         with:
           ref: ${{ github.ref_name }}
-      - name: Setup Python 3.9
+      - name: Setup Python 3.11
         uses: actions/setup-python@v2
         with:
-          python-version: 3.9
+          python-version: 3.11
       - name: Build python package
         run: |
           python -m pip install wheel twine
@@ -64,16 +64,16 @@ jobs:
           twine upload -u __token__ -p ${{ secrets.PYPI_TOKEN }} dist/*
 
   release-github-pages:
-    needs: update-verstion-and-chengelog
+    needs: update-version-and-changelog
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v2
         with:
           ref: ${{ github.ref_name }}
-      - name: Setup Python 3.9
+      - name: Setup Python 3.11
         uses: actions/setup-python@v2
         with:
-          python-version: 3.9
+          python-version: 3.11
       - uses: actions/cache@v2
         with:
           path: ${{ env.pythonLocation }}
