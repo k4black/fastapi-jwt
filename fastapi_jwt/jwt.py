@@ -209,7 +209,7 @@ class JwtAuthBase(ABC):
             key="access_token_cookie",
             value=access_token,
             httponly=False,
-            max_age=seconds_expires,  # type: ignore
+            max_age=seconds_expires,
         )
 
     @staticmethod
@@ -225,7 +225,7 @@ class JwtAuthBase(ABC):
             key="refresh_token_cookie",
             value=refresh_token,
             httponly=True,
-            max_age=seconds_expires,  # type: ignore
+            max_age=seconds_expires,
         )
 
     @staticmethod
