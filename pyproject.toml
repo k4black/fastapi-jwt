@@ -33,6 +33,7 @@ dependencies = [
 
 [project.urls]
 homepage = "https://github.com/k4black/fastapi-jwt"
+documentation = "https://k4black.github.io/fastapi-jwt/"
 
 
 [project.optional-dependencies]
