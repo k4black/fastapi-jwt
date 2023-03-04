@@ -7,7 +7,7 @@ build-backend = "setuptools.build_meta"
 name = "fastapi-jwt"
 description = "`FastAPI` extension for JTW Auth"
 readme = "README.md"
-#license = {text = "MIT License"}
+license = {text = "MIT License"}
 authors = [
   {name = "Konstantin Chernyshev", email = "kdchernyshev@gmail.com"},
 ]
