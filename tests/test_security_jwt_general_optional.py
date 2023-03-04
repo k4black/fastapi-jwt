@@ -1,6 +1,6 @@
 import datetime
-from uuid import uuid4
 from typing import Optional, Set
+from uuid import uuid4
 
 from fastapi import FastAPI, Security
 from fastapi.testclient import TestClient
