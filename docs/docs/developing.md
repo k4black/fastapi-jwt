@@ -1,5 +1,11 @@
 # Developing 
 
+Recommend to use venv for development.  
+```shell
+python3 -m venv .venv
+source .venv/bin/activate
+```
+
 Install dev dependencies 
 ```shell
 python -m pip install .[docs,test]  # \[docs,test\] in zsh
