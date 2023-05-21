@@ -10,20 +10,16 @@
       
       
       
-        <link rel="canonical" href="https://k4black.github.io/fastapi-jwt/developing/">
+        <link rel="canonical" href="https://k4black.github.io/fastapi-jwt/contributing/">
       
       
-        <link rel="prev" href="../user_guide/examples/">
-      
-      
-        <link rel="next" href="../release-notes/">
       
       <link rel="icon" href="../images/logo-circle.svg">
       <meta name="generator" content="mkdocs-1.4.3, mkdocs-material-9.1.14">
     
     
       
-        <title>Developing - fastapi-jwt</title>
+        <title>Contributing - fastapi-jwt</title>
       
     
     
@@ -77,7 +73,7 @@
     <div data-md-component="skip">
       
         
-        <a href="#developing" class="md-skip">
+        <a href="#contributing-to-fastapi-jwt" class="md-skip">
           Skip to content
         </a>
       
@@ -115,7 +111,7 @@
         <div class="md-header__topic" data-md-component="header-topic">
           <span class="md-ellipsis">
             
-              Developing
+              Contributing
             
           </span>
         </div>
@@ -326,133 +322,11 @@
 
   
   
-    
   
-  
-    <li class="md-nav__item md-nav__item--active">
-      
-      <input class="md-nav__toggle md-toggle" type="checkbox" id="__toc">
-      
-      
-        
-      
-      
-        <label class="md-nav__link md-nav__link--active" for="__toc">
-          Developing
-          <span class="md-nav__icon md-icon"></span>
-        </label>
-      
-      <a href="./" class="md-nav__link md-nav__link--active">
+    <li class="md-nav__item">
+      <a href="../developing/" class="md-nav__link">
         Developing
       </a>
-      
-        
-
-<nav class="md-nav md-nav--secondary" aria-label="Table of contents">
-  
-  
-  
-    
-  
-  
-    <label class="md-nav__title" for="__toc">
-      <span class="md-nav__icon md-icon"></span>
-      Table of contents
-    </label>
-    <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
-      
-        <li class="md-nav__item">
-  <a href="#python-package" class="md-nav__link">
-    Python package
-  </a>
-  
-    <nav class="md-nav" aria-label="Python package">
-      <ul class="md-nav__list">
-        
-          <li class="md-nav__item">
-  <a href="#linting-and-testing" class="md-nav__link">
-    Linting and Testing
-  </a>
-  
-</li>
-        
-          <li class="md-nav__item">
-  <a href="#publishing" class="md-nav__link">
-    Publishing
-  </a>
-  
-</li>
-        
-      </ul>
-    </nav>
-  
-</li>
-      
-        <li class="md-nav__item">
-  <a href="#docs" class="md-nav__link">
-    Docs
-  </a>
-  
-    <nav class="md-nav" aria-label="Docs">
-      <ul class="md-nav__list">
-        
-          <li class="md-nav__item">
-  <a href="#editing" class="md-nav__link">
-    Editing
-  </a>
-  
-</li>
-        
-          <li class="md-nav__item">
-  <a href="#building-pkg-docs-todo" class="md-nav__link">
-    Building pkg docs (TODO)
-  </a>
-  
-</li>
-        
-          <li class="md-nav__item">
-  <a href="#deploy" class="md-nav__link">
-    Deploy
-  </a>
-  
-    <nav class="md-nav" aria-label="Deploy">
-      <ul class="md-nav__list">
-        
-          <li class="md-nav__item">
-  <a href="#without-versioning-now" class="md-nav__link">
-    Without versioning (now)
-  </a>
-  
-</li>
-        
-          <li class="md-nav__item">
-  <a href="#with-mike-as-versioning-tool-todo" class="md-nav__link">
-    With mike as versioning tool (TODO)
-  </a>
-  
-</li>
-        
-          <li class="md-nav__item">
-  <a href="#with-read-the-docs-as-versioning-tool-todo" class="md-nav__link">
-    With read-the-docs as versioning tool (TODO)
-  </a>
-  
-</li>
-        
-      </ul>
-    </nav>
-  
-</li>
-        
-      </ul>
-    </nav>
-  
-</li>
-      
-    </ul>
-  
-</nav>
-      
     </li>
   
 
@@ -499,85 +373,24 @@
     <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
       
         <li class="md-nav__item">
-  <a href="#python-package" class="md-nav__link">
-    Python package
+  <a href="#styleguides" class="md-nav__link">
+    Styleguides
   </a>
   
-    <nav class="md-nav" aria-label="Python package">
+    <nav class="md-nav" aria-label="Styleguides">
       <ul class="md-nav__list">
         
           <li class="md-nav__item">
-  <a href="#linting-and-testing" class="md-nav__link">
-    Linting and Testing
+  <a href="#git-commit-messages" class="md-nav__link">
+    Git Commit Messages
   </a>
   
 </li>
         
           <li class="md-nav__item">
-  <a href="#publishing" class="md-nav__link">
-    Publishing
+  <a href="#python-styleguide" class="md-nav__link">
+    Python styleguide
   </a>
-  
-</li>
-        
-      </ul>
-    </nav>
-  
-</li>
-      
-        <li class="md-nav__item">
-  <a href="#docs" class="md-nav__link">
-    Docs
-  </a>
-  
-    <nav class="md-nav" aria-label="Docs">
-      <ul class="md-nav__list">
-        
-          <li class="md-nav__item">
-  <a href="#editing" class="md-nav__link">
-    Editing
-  </a>
-  
-</li>
-        
-          <li class="md-nav__item">
-  <a href="#building-pkg-docs-todo" class="md-nav__link">
-    Building pkg docs (TODO)
-  </a>
-  
-</li>
-        
-          <li class="md-nav__item">
-  <a href="#deploy" class="md-nav__link">
-    Deploy
-  </a>
-  
-    <nav class="md-nav" aria-label="Deploy">
-      <ul class="md-nav__list">
-        
-          <li class="md-nav__item">
-  <a href="#without-versioning-now" class="md-nav__link">
-    Without versioning (now)
-  </a>
-  
-</li>
-        
-          <li class="md-nav__item">
-  <a href="#with-mike-as-versioning-tool-todo" class="md-nav__link">
-    With mike as versioning tool (TODO)
-  </a>
-  
-</li>
-        
-          <li class="md-nav__item">
-  <a href="#with-read-the-docs-as-versioning-tool-todo" class="md-nav__link">
-    With read-the-docs as versioning tool (TODO)
-  </a>
-  
-</li>
-        
-      </ul>
-    </nav>
   
 </li>
         
@@ -601,80 +414,48 @@
                   
 
 
-<h1 id="developing">Developing</h1>
-<p>Recommend to use venv for development.<br />
-<div class="highlight"><pre><span></span><code>python3<span class="w"> </span>-m<span class="w"> </span>venv<span class="w"> </span>.venv
-<span class="nb">source</span><span class="w"> </span>.venv/bin/activate
-</code></pre></div></p>
-<p>Install dev dependencies 
-<div class="highlight"><pre><span></span><code>python<span class="w"> </span>-m<span class="w"> </span>pip<span class="w"> </span>install<span class="w"> </span>.<span class="o">[</span>docs,test<span class="o">]</span><span class="w">  </span><span class="c1"># \[docs,test\] in zsh</span>
-</code></pre></div></p>
-<hr />
-<h2 id="python-package">Python package</h2>
-<h3 id="linting-and-testing">Linting and Testing</h3>
-<p>It is important NOT ONLY to get OK from all linters (or achieve score in the case of pylint), but also to write good code.  <br />
-P.S. It's hard to say what a Good Code is. Let's say that it should be simple, clear, commented, and so on.
-<div class="highlight"><pre><span></span><code>python<span class="w"> </span>-m<span class="w"> </span>flake8<span class="w"> </span>.
-python<span class="w"> </span>-m<span class="w"> </span>mypy<span class="w"> </span>fastapi_jwt
-python<span class="w"> </span>-m<span class="w"> </span>isort<span class="w"> </span>.<span class="w"> </span>--check
-</code></pre></div></p>
-<p>Try NOT ONLY to achieve 100% coverage, but also to cover extreme cases, height load cases, multithreaded cases, incorrect input, and so on.
-<div class="highlight"><pre><span></span><code>python<span class="w"> </span>-m<span class="w"> </span>pytest
-</code></pre></div></p>
-<p>You can fix some issues in auto mode.</p>
+<!-- BEGIN INCLUDE ../../CONTRIBUTING.md -->
+<h1 id="contributing-to-fastapi-jwt">Contributing to fastapi-jwt</h1>
+<p>First, thanks for taking the time to contribute! 😍<br />
+It's highly welcomed, and it can help the project to develop and become more usefully and suitable for everyone. </p>
+<h2 id="styleguides">Styleguides</h2>
+<h3 id="git-commit-messages">Git Commit Messages</h3>
+<p>This project uses light version of <a href="https://www.conventionalcommits.org/en/v1.0.0/">conventional commits</a>. 
+tl;dr</p>
 <ul>
-<li>Sorting imports and make autopep.
-    <div class="highlight"><pre><span></span><code>python<span class="w"> </span>-m<span class="w"> </span>isort<span class="w"> </span>.
-</code></pre></div></li>
+<li>Use the present tense ("Add feature" not "Added feature")</li>
+<li>Use the imperative mood ("Move cursor to..." not "Moves cursor to...")</li>
+<li>Limit the first line to 72 characters or less</li>
+<li>Reference issues and pull requests in commit body</li>
+<li>When only changing documentation, include [ci skip] in the commit title</li>
+<li>Consider starting the commit message with an applicable tag:<ul>
+<li><code>fix</code> - small bug fix</li>
+<li><code>docs</code> - docs changes </li>
+<li><code>feat</code> - a new feature </li>
+<li><code>chore</code> - changes that do not relate to a fix or feature and don't modify src or test files (for example updating dependencies) </li>
+<li><code>refactor</code> - code refactor that neither fixes a bug nor adds a feature</li>
+<li><code>style</code> - changes that do not affect the meaning of the code</li>
+<li><code>perf</code> - changes that improve performance</li>
+<li><code>test</code> - including new or correcting previous tests</li>
+<li><code>ci</code> - continuous integration related</li>
 </ul>
-<h3 id="publishing">Publishing</h3>
-<p>Egg (deprecated) 
-<div class="highlight"><pre><span></span><code>python3<span class="w"> </span>setup.py<span class="w"> </span>build
-python3<span class="w"> </span>setup.py<span class="w"> </span>sdist
-twine<span class="w"> </span>upload<span class="w"> </span>-r<span class="w"> </span>testpypi<span class="w"> </span>dist/*
-twine<span class="w"> </span>upload<span class="w"> </span>dist/*
-</code></pre></div></p>
-<p>Build Wheel and see what inside
-<div class="highlight"><pre><span></span><code>python3<span class="w"> </span>-m<span class="w"> </span>pip<span class="w"> </span>wheel<span class="w"> </span>.<span class="w"> </span>--no-deps<span class="w"> </span>--wheel-dir<span class="w"> </span>dist
-tar<span class="w"> </span>--list<span class="w"> </span>-f<span class="w"> </span>dist/fastapi-jwt-0.0.1-py3-none-any.whl<span class="w">  </span>
-</code></pre></div></p>
-<p>Load dist to pypi
-<div class="highlight"><pre><span></span><code>twine<span class="w"> </span>upload<span class="w"> </span>-r<span class="w"> </span>testpypi<span class="w"> </span>dist/*
-twine<span class="w"> </span>upload<span class="w"> </span>dist/*
-</code></pre></div></p>
-<hr />
-<h2 id="docs">Docs</h2>
-<h3 id="editing">Editing</h3>
-<p>Edit it in <code>docs/</code></p>
-<p><code>mkdocs</code> can be run as dev server with auto-reload.
-<div class="highlight"><pre><span></span><code>mkdocs<span class="w"> </span>serve<span class="w"> </span>--config-file<span class="w"> </span>docs/mkdocs.yml
-</code></pre></div></p>
-<p>Note: Server will auto-restart for all changed <code>docs/*</code> files.<br />
-If you want to edit <code>README.md</code> or <code>CONTRIBUTING.md</code> you should restart server on each change.  </p>
-<h3 id="building-pkg-docs-todo">Building pkg docs (<code>TODO</code>)</h3>
-<p>Add python backend docs <code>TODO</code>
-<div class="highlight"><pre><span></span><code>lazydocs<span class="w"> </span><span class="se">\</span>
-<span class="w">    </span>--output-path<span class="o">=</span><span class="s2">&quot;./docs/references/backend&quot;</span><span class="w"> </span><span class="se">\</span>
-<span class="w">    </span>--overview-file<span class="o">=</span><span class="s2">&quot;index.md&quot;</span><span class="w"> </span><span class="se">\</span>
-<span class="w">    </span>--src-base-url<span class="o">=</span><span class="s2">&quot;https://github.com/k4black/flowingo/blob/master&quot;</span><span class="w"> </span><span class="se">\</span>
-<span class="w">    </span>flowingo
-</code></pre></div></p>
-<h3 id="deploy">Deploy</h3>
-<h4 id="without-versioning-now">Without versioning (now)</h4>
-<p>Build and deploy docs itself
-<div class="highlight"><pre><span></span><code>mkdocs<span class="w"> </span>build<span class="w"> </span>--config-file<span class="w"> </span>docs/mkdocs.yml
-mkdocs<span class="w"> </span>gh-deploy<span class="w"> </span>--config-file<span class="w"> </span>docs/mkdocs.yml<span class="w">    </span>
-</code></pre></div></p>
-<h4 id="with-mike-as-versioning-tool-todo">With <code>mike</code> as versioning tool (<code>TODO</code>)</h4>
-<p>Deploy with <code>mike</code> to github-pages with versioning support
-<div class="highlight"><pre><span></span><code>mike<span class="w"> </span>deploy<span class="w"> </span>--config-file<span class="w"> </span>docs/mkdocs.yml<span class="w"> </span><span class="m">0</span>.0.1<span class="w"> </span>latest<span class="w"> </span>--push
-mike<span class="w"> </span><span class="nb">alias</span><span class="w"> </span>--config-file<span class="w"> </span>docs/mkdocs.yml<span class="w"> </span><span class="m">0</span>.0.1<span class="w"> </span><span class="m">0</span>.0.x<span class="w"> </span>--push
-mike<span class="w"> </span>set-default<span class="w"> </span>--config-file<span class="w"> </span>docs/mkdocs.yml<span class="w"> </span>latest<span class="w"> </span>--push
-</code></pre></div></p>
-<h4 id="with-read-the-docs-as-versioning-tool-todo">With <code>read-the-docs</code> as versioning tool (<code>TODO</code>)</h4>
-<p>Deploy with <code>mkdocs</code> to read-the-docs for versioning support
-<div class="highlight"><pre><span></span><code>TODO
-</code></pre></div></p>
+</li>
+</ul>
+<p>For example  </p>
+<p>Good:
+* <code>feat: create new api endpoint for student scores reporting</code>
+* <code>perf: improve performance with lazy load implementation for images</code>
+* <code>chore: update flask dependency to 2.1 version</code></p>
+<p>Bad:
+* <code>some fixes</code>
+* <code>oops</code>
+* <code>fixed bug on landing page</code>
+* <code>style changes and update</code></p>
+<h3 id="python-styleguide">Python styleguide</h3>
+<p>All python code should follow <a href="https://www.python.org/dev/peps/pep-0008/">PEP8</a> and be typed. <br />
+The code linted with <code>flake8</code> and <code>isort</code>, as well as type checked with <code>mypy</code>.</p>
+<p>TBA</p>
+<!-- END INCLUDE -->
 
 
 
