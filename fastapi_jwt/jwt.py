@@ -15,6 +15,17 @@ except ImportError:  # pragma: nocover
     jwt = None  # type: ignore[assignment]
 
 
+def utcnow():
+    try:
+        from datetime import UTC
+    except ImportError:  # pragma: nocover
+        # UTC was added in python 3.12, as datetime.utcnow was
+        # marked for deprecation.
+        return datetime.utcnow()
+    else:
+        return datetime.now(UTC)
+
+
 __all__ = [
     "JwtAuthorizationCredentials",
     "JwtAccessBearer",
@@ -132,7 +143,7 @@ class JwtAuthBase(ABC):
         unique_identifier: str,
         token_type: str,
     ) -> Dict[str, Any]:
-        now = datetime.utcnow()
+        now = utcnow()
 
         return {
             "subject": subject.copy(),  # main subject
