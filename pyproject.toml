@@ -47,7 +47,7 @@ test = [
     "mypy >=1.0.0,<2.0.0",
     "flake8 >=6.0.0,<7.0.0",
     "isort >=5.11.0,<6.0.0",
-    "types-python-jose ==3.3.4.5"
+    "types-python-jose ==3.3.4.8"
 ]
 docs = [
     "mkdocs >=1.4.0,<2.0.0",
