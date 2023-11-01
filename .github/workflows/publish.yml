@@ -10,7 +10,7 @@ jobs:
   update-version-and-changelog:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v3
+      - uses: actions/checkout@v4
         with:
           ref: main
       - name: Update version file
@@ -38,7 +38,7 @@ jobs:
     needs: update-version-and-changelog
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v3
+      - uses: actions/checkout@v4
         with:
           ref: ${{ github.ref_name }}
       - name: Update Release description
@@ -50,7 +50,7 @@ jobs:
     needs: update-version-and-changelog
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v3
+      - uses: actions/checkout@v4
         with:
           ref: ${{ github.ref_name }}
       - name: Setup Python 3.11
@@ -67,7 +67,7 @@ jobs:
     needs: update-version-and-changelog
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v3
+      - uses: actions/checkout@v4
         with:
           ref: ${{ github.ref_name }}
       - name: Setup Python 3.11

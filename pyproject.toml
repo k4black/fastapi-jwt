@@ -43,18 +43,18 @@ test = [
     "pytest-cov >=4.0.0,<5.0.0",
     "pytest-mock >=3.0.0,<4.0.0",
     "requests >=2.28.0,<3.0.0",
-    "black ==23.1.0",
+    "black ==23.10.1",
     "mypy >=1.0.0,<2.0.0",
     "flake8 >=6.0.0,<7.0.0",
     "isort >=5.11.0,<6.0.0",
-    "types-python-jose ==3.3.4.5"
+    "types-python-jose ==3.3.4.8"
 ]
 docs = [
     "mkdocs >=1.4.0,<2.0.0",
     "mkdocs-material >=9.0.0,<10.0.0",
     "MkAutoDoc >=0.2.0,<1.0.0",
     "lazydocs >=0.4.5,<1.0.0",
-    "mkdocs-include-markdown-plugin >=4.0.0,<5.0.0",
+    "mkdocs-include-markdown-plugin >=4.0.0,<7.0.0",
     "mkdocs-awesome-pages-plugin >=2.8.0,<3.0.0",
     "mike >=1.1.0,<2.0.0"
 ]
