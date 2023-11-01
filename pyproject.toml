@@ -45,6 +45,7 @@ test = [
     "requests >=2.28.0,<3.0.0",
     "black ==23.10.1",
     "mypy >=1.0.0,<2.0.0",
+    "flake8 >=3.9.0,<4.0.0",
     "ruff >=0.1.0,<1.0.0",
     "isort >=5.11.0,<6.0.0",
     "types-python-jose ==3.3.4.8"
@@ -77,15 +78,36 @@ warn_unused_ignores = true
 warn_unreachable = true
 allow_untyped_decorators = true
 
+
 [tool.pytest.ini_options]
 minversion = "6.0"
 testpaths = ["tests"]
 python_files = "test_*.py"
 addopts = "--cov=fastapi_jwt/ --cov-report term-missing"
 
+
+# TODO: remove in favor of ruff "I" ruleset
 [tool.isort]
 profile = "black"
 src_paths = ["fastapi-jwt", "tests"]
 known_first_party = ["fastapi_jwt", "tests"]
 line_length = 120
 combine_as_imports = true
+
+
+[tool.ruff]
+line-length = 120
+target-version = "py312"
+
+[tool.ruff.lint]
+select = ["E", "F", "W", "I"]
+ignore = []
+
+fixable = ["ALL"]  # Allow fix for all enabled rules (when `--fix`) is provided.
+unfixable = []
+
+[tool.ruff.format]
+quote-style = "double"
+indent-style = "space"
+skip-magic-trailing-comma = false
+line-ending = "auto"

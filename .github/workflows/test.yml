@@ -21,10 +21,13 @@ jobs:
           python -m pip install -e .[test]
       - name: Run isort
         run: python -m isort fastapi_jwt --check
-      - name: Run ruff
-        run: python -m ruff fastapi_jwt
+      - name: Run linter
+        run: | 
+          # can remove flake8 after https://github.com/astral-sh/ruff/issues/2402
+          python -m flake8 fastapi_jwt tests
+          python -m ruff check fastapi_jwt tests
       - name: Run mypy
-        run: python -m mypy fastapi_jwt
+        run: python -m mypy fastapi_jwt tests
 
   test-python:
     runs-on: ubuntu-latest
