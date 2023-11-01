@@ -27,7 +27,7 @@ jobs:
           python -m flake8 fastapi_jwt tests
           python -m ruff check fastapi_jwt tests
       - name: Run mypy
-        run: python -m mypy fastapi_jwt tests
+        run: python -m mypy fastapi_jwt
 
   test-python:
     runs-on: ubuntu-latest
