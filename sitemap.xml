@@ -2,32 +2,32 @@
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
     <url>
          <loc>https://k4black.github.io/fastapi-jwt/</loc>
-         <lastmod>2023-05-21</lastmod>
+         <lastmod>2023-11-02</lastmod>
          <changefreq>daily</changefreq>
     </url>
     <url>
          <loc>https://k4black.github.io/fastapi-jwt/contributing/</loc>
-         <lastmod>2023-05-21</lastmod>
+         <lastmod>2023-11-02</lastmod>
          <changefreq>daily</changefreq>
     </url>
     <url>
          <loc>https://k4black.github.io/fastapi-jwt/developing/</loc>
-         <lastmod>2023-05-21</lastmod>
+         <lastmod>2023-11-02</lastmod>
          <changefreq>daily</changefreq>
     </url>
     <url>
          <loc>https://k4black.github.io/fastapi-jwt/release-notes/</loc>
-         <lastmod>2023-05-21</lastmod>
+         <lastmod>2023-11-02</lastmod>
          <changefreq>daily</changefreq>
     </url>
     <url>
          <loc>https://k4black.github.io/fastapi-jwt/user_guide/classes/</loc>
-         <lastmod>2023-05-21</lastmod>
+         <lastmod>2023-11-02</lastmod>
          <changefreq>daily</changefreq>
     </url>
     <url>
          <loc>https://k4black.github.io/fastapi-jwt/user_guide/examples/</loc>
-         <lastmod>2023-05-21</lastmod>
+         <lastmod>2023-11-02</lastmod>
          <changefreq>daily</changefreq>
     </url>
 </urlset>
