@@ -37,14 +37,9 @@ __all__ = [
 ]
 
 
-class JwtAuthorizationCredentials:
-    def __init__(self, subject: Dict[str, Any], jti: Optional[str] = None):
-        self.subject = subject
-        self.jti = jti
-
-    def __getitem__(self, item: str) -> Any:
-        return self.subject[item]
-
+class JwtAuthorizationCredentials(dict):
+    def __init__(self, payload: Dict[str, Any]):
+        super().__init__(payload)
 
 class JwtAuthBase(ABC):
     class JwtAccessCookie(APIKeyCookie):
@@ -293,7 +288,7 @@ class JwtAccess(JwtAuthBase):
 
         if payload:
             return JwtAuthorizationCredentials(
-                payload[self.subject_key], payload.get("jti", None)
+                payload
             )
         return None
 
