@@ -75,6 +75,7 @@ class JwtAuthBase(ABC):
         algorithm: str = jwt.ALGORITHMS.HS256,  # type: ignore[attr-defined]
         access_expires_delta: Optional[timedelta] = None,
         refresh_expires_delta: Optional[timedelta] = None,
+        decode_kwargs: Optional[dict] = None
     ):
         assert jwt is not None, "python-jose must be installed to use JwtAuth"
         if places:
@@ -93,6 +94,7 @@ class JwtAuthBase(ABC):
         self.algorithm = algorithm
         self.access_expires_delta = access_expires_delta or timedelta(minutes=15)
         self.refresh_expires_delta = refresh_expires_delta or timedelta(days=31)
+        self.decode_kwargs = decode_kwargs
 
     @classmethod
     def from_other(
@@ -103,6 +105,7 @@ class JwtAuthBase(ABC):
         algorithm: Optional[str] = None,
         access_expires_delta: Optional[timedelta] = None,
         refresh_expires_delta: Optional[timedelta] = None,
+        decode_kwargs: Optional[dict] = None
     ) -> 'JwtAuthBase':
         return cls(
             secret_key=secret_key or other.secret_key,
@@ -110,6 +113,7 @@ class JwtAuthBase(ABC):
             algorithm=algorithm or other.algorithm,
             access_expires_delta=access_expires_delta or other.access_expires_delta,
             refresh_expires_delta=refresh_expires_delta or other.refresh_expires_delta,
+            decode_kwargs=decode_kwargs or other.decode_kwargs
         )
 
     def _decode(self, token: str) -> Optional[Dict[str, Any]]:
@@ -119,6 +123,7 @@ class JwtAuthBase(ABC):
                 self.secret_key,
                 algorithms=[self.algorithm],
                 options={"leeway": 10},
+                **self.decode_kwargs
             )
             return payload
         except jwt.ExpiredSignatureError as e:  # type: ignore[attr-defined]
@@ -296,6 +301,7 @@ class JwtAccessBearer(JwtAccess):
         algorithm: str = jwt.ALGORITHMS.HS256,  # type: ignore[attr-defined]
         access_expires_delta: Optional[timedelta] = None,
         refresh_expires_delta: Optional[timedelta] = None,
+        decode_kwargs: Optional[dict] = None
     ):
         super().__init__(
             secret_key=secret_key,
@@ -303,8 +309,9 @@ class JwtAccessBearer(JwtAccess):
             auto_error=auto_error,
             algorithm=algorithm,
             access_expires_delta=access_expires_delta,
-            refresh_expires_delta=refresh_expires_delta,
+            refresh_expires_delta=refresh_expires_delta
         )
+        self.decode_kwargs = decode_kwargs
 
     async def __call__(
         self, bearer: JwtAuthBase.JwtAccessBearer = Security(JwtAccess._bearer)
