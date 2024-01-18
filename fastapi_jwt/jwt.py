@@ -38,9 +38,10 @@ __all__ = [
 
 
 class JwtAuthorizationCredentials:
-    def __init__(self, subject: Dict[str, Any], jti: Optional[str] = None):
+    def __init__(self, subject: Dict[str, Any], jti: Optional[str] = None, exp: Optional[int] = None):
         self.subject = subject
         self.jti = jti
+        self.exp = exp
 
     def __getitem__(self, item: str) -> Any:
         return self.subject[item]
@@ -283,7 +284,7 @@ class JwtAccess(JwtAuthBase):
 
         if payload:
             return JwtAuthorizationCredentials(
-                payload["subject"], payload.get("jti", None)
+                payload["subject"], payload.get("jti", None), payload.get("exp", None)
             )
         return None
 
@@ -405,7 +406,7 @@ class JwtRefresh(JwtAuthBase):
                 return None
 
         return JwtAuthorizationCredentials(
-            payload["subject"], payload.get("jti", None)
+            payload["subject"], payload.get("jti", None), payload.get("exp", None)
         )
 
 
