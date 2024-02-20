@@ -75,6 +75,8 @@ class JwtAuthBase(ABC):
         algorithm: str = jwt.ALGORITHMS.HS256,  # type: ignore[attr-defined]
         access_expires_delta: Optional[timedelta] = None,
         refresh_expires_delta: Optional[timedelta] = None,
+        expired_signature_error_message: str = '',
+        incorrect_token_error_message: str = '',
     ):
         assert jwt is not None, "python-jose must be installed to use JwtAuth"
         if places:
@@ -93,6 +95,8 @@ class JwtAuthBase(ABC):
         self.algorithm = algorithm
         self.access_expires_delta = access_expires_delta or timedelta(minutes=15)
         self.refresh_expires_delta = refresh_expires_delta or timedelta(days=31)
+        self.expired_signature_error_message = expired_signature_error_message
+        self.incorrect_token_error_message = incorrect_token_error_message
 
     @classmethod
     def from_other(
@@ -124,14 +128,18 @@ class JwtAuthBase(ABC):
         except jwt.ExpiredSignatureError as e:  # type: ignore[attr-defined]
             if self.auto_error:
                 raise HTTPException(
-                    status_code=HTTP_401_UNAUTHORIZED, detail=f"Token time expired: {e}"
+                    status_code=HTTP_401_UNAUTHORIZED, 
+                    detail=f"Token time expired: {e}",
+                    message=self.expired_signature_error_message
                 )
             else:
                 return None
         except jwt.JWTError as e:  # type: ignore[attr-defined]
             if self.auto_error:
                 raise HTTPException(
-                    status_code=HTTP_401_UNAUTHORIZED, detail=f"Wrong token: {e}"
+                    status_code=HTTP_401_UNAUTHORIZED, 
+                    detail=f"Wrong token: {e}",
+                    message=self.incorrect_token_error_message
                 )
             else:
                 return None
@@ -264,6 +272,8 @@ class JwtAccess(JwtAuthBase):
         algorithm: str = jwt.ALGORITHMS.HS256,  # type: ignore[attr-defined]
         access_expires_delta: Optional[timedelta] = None,
         refresh_expires_delta: Optional[timedelta] = None,
+        expired_signature_error_message: str = '',
+        incorrect_token_error_message: str = '',
     ):
         super().__init__(
             secret_key,
@@ -272,6 +282,8 @@ class JwtAccess(JwtAuthBase):
             algorithm=algorithm,
             access_expires_delta=access_expires_delta,
             refresh_expires_delta=refresh_expires_delta,
+            expired_signature_error_message = expired_signature_error_message,
+            incorrect_token_error_message = incorrect_token_error_message,
         )
 
     async def _get_credentials(
@@ -296,6 +308,8 @@ class JwtAccessBearer(JwtAccess):
         algorithm: str = jwt.ALGORITHMS.HS256,  # type: ignore[attr-defined]
         access_expires_delta: Optional[timedelta] = None,
         refresh_expires_delta: Optional[timedelta] = None,
+        expired_signature_error_message: str = '',
+        incorrect_token_error_message: str = '',
     ):
         super().__init__(
             secret_key=secret_key,
@@ -304,6 +318,8 @@ class JwtAccessBearer(JwtAccess):
             algorithm=algorithm,
             access_expires_delta=access_expires_delta,
             refresh_expires_delta=refresh_expires_delta,
+            expired_signature_error_message = expired_signature_error_message,
+            incorrect_token_error_message = incorrect_token_error_message,
         )
 
     async def __call__(
@@ -320,6 +336,8 @@ class JwtAccessCookie(JwtAccess):
         algorithm: str = jwt.ALGORITHMS.HS256,  # type: ignore[attr-defined]
         access_expires_delta: Optional[timedelta] = None,
         refresh_expires_delta: Optional[timedelta] = None,
+        expired_signature_error_message: str = '',
+        incorrect_token_error_message: str = '',
     ):
         super().__init__(
             secret_key=secret_key,
@@ -328,6 +346,8 @@ class JwtAccessCookie(JwtAccess):
             algorithm=algorithm,
             access_expires_delta=access_expires_delta,
             refresh_expires_delta=refresh_expires_delta,
+            expired_signature_error_message = expired_signature_error_message,
+            incorrect_token_error_message = incorrect_token_error_message,
         )
 
     async def __call__(
@@ -345,6 +365,8 @@ class JwtAccessBearerCookie(JwtAccess):
         algorithm: str = jwt.ALGORITHMS.HS256,  # type: ignore[attr-defined]
         access_expires_delta: Optional[timedelta] = None,
         refresh_expires_delta: Optional[timedelta] = None,
+        expired_signature_error_message: str = '',
+        incorrect_token_error_message: str = '',
     ):
         super().__init__(
             secret_key=secret_key,
@@ -353,6 +375,8 @@ class JwtAccessBearerCookie(JwtAccess):
             algorithm=algorithm,
             access_expires_delta=access_expires_delta,
             refresh_expires_delta=refresh_expires_delta,
+            expired_signature_error_message = expired_signature_error_message,
+            incorrect_token_error_message = incorrect_token_error_message,
         )
 
     async def __call__(
@@ -375,6 +399,8 @@ class JwtRefresh(JwtAuthBase):
         algorithm: str = jwt.ALGORITHMS.HS256,  # type: ignore[attr-defined]
         access_expires_delta: Optional[timedelta] = None,
         refresh_expires_delta: Optional[timedelta] = None,
+        expired_signature_error_message: str = '',
+        incorrect_token_error_message: str = '',
     ):
         super().__init__(
             secret_key,
@@ -383,6 +409,8 @@ class JwtRefresh(JwtAuthBase):
             algorithm=algorithm,
             access_expires_delta=access_expires_delta,
             refresh_expires_delta=refresh_expires_delta,
+            expired_signature_error_message = expired_signature_error_message,
+            incorrect_token_error_message = incorrect_token_error_message,
         )
 
     async def _get_credentials(
@@ -417,6 +445,8 @@ class JwtRefreshBearer(JwtRefresh):
         algorithm: str = jwt.ALGORITHMS.HS256,  # type: ignore[attr-defined]
         access_expires_delta: Optional[timedelta] = None,
         refresh_expires_delta: Optional[timedelta] = None,
+        expired_signature_error_message: str = '',
+        incorrect_token_error_message: str = '',
     ):
         super().__init__(
             secret_key=secret_key,
@@ -425,6 +455,8 @@ class JwtRefreshBearer(JwtRefresh):
             algorithm=algorithm,
             access_expires_delta=access_expires_delta,
             refresh_expires_delta=refresh_expires_delta,
+            expired_signature_error_message = expired_signature_error_message,
+            incorrect_token_error_message = incorrect_token_error_message,
         )
 
     async def __call__(
@@ -441,6 +473,8 @@ class JwtRefreshCookie(JwtRefresh):
         algorithm: str = jwt.ALGORITHMS.HS256,  # type: ignore[attr-defined]
         access_expires_delta: Optional[timedelta] = None,
         refresh_expires_delta: Optional[timedelta] = None,
+        expired_signature_error_message: str = '',
+        incorrect_token_error_message: str = '',
     ):
         super().__init__(
             secret_key=secret_key,
@@ -449,6 +483,8 @@ class JwtRefreshCookie(JwtRefresh):
             algorithm=algorithm,
             access_expires_delta=access_expires_delta,
             refresh_expires_delta=refresh_expires_delta,
+            expired_signature_error_message = expired_signature_error_message,
+            incorrect_token_error_message = incorrect_token_error_message,
         )
 
     async def __call__(
@@ -466,6 +502,8 @@ class JwtRefreshBearerCookie(JwtRefresh):
         algorithm: str = jwt.ALGORITHMS.HS256,  # type: ignore[attr-defined]
         access_expires_delta: Optional[timedelta] = None,
         refresh_expires_delta: Optional[timedelta] = None,
+        expired_signature_error_message: str = '',
+        incorrect_token_error_message: str = '',
     ):
         super().__init__(
             secret_key=secret_key,
@@ -474,6 +512,8 @@ class JwtRefreshBearerCookie(JwtRefresh):
             algorithm=algorithm,
             access_expires_delta=access_expires_delta,
             refresh_expires_delta=refresh_expires_delta,
+            expired_signature_error_message = expired_signature_error_message,
+            incorrect_token_error_message = incorrect_token_error_message,
         )
 
     async def __call__(
