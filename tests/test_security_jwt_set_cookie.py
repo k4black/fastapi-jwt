@@ -1,36 +1,42 @@
+import pytest
 from fastapi import FastAPI, Response
 from fastapi.testclient import TestClient
 
 from fastapi_jwt import JwtAccessCookie, JwtRefreshCookie
-
-app = FastAPI()
-
-access_security = JwtAccessCookie(secret_key="secret_key")
-refresh_security = JwtRefreshCookie(secret_key="secret_key")
+from fastapi_jwt import AuthlibJWTBackend, PythonJoseJWTBackend, define_default_jwt_backend
 
 
-@app.post("/auth")
-def auth(response: Response):
-    subject = {"username": "username", "role": "user"}
+def create_example_client(jwt_backend):
+    define_default_jwt_backend(jwt_backend)
+    app = FastAPI()
 
-    access_token = access_security.create_access_token(subject=subject)
-    refresh_token = access_security.create_refresh_token(subject=subject)
-
-    access_security.set_access_cookie(response, access_token)
-    refresh_security.set_refresh_cookie(response, refresh_token)
-
-    return {"access_token": access_token, "refresh_token": refresh_token}
+    access_security = JwtAccessCookie(secret_key="secret_key")
+    refresh_security = JwtRefreshCookie(secret_key="secret_key")
 
 
-@app.delete("/auth")
-def logout(response: Response):
-    access_security.unset_access_cookie(response)
-    refresh_security.unset_refresh_cookie(response)
+    @app.post("/auth")
+    def auth(response: Response):
+        subject = {"username": "username", "role": "user"}
 
-    return {"msg": "Successful logout"}
+        access_token = access_security.create_access_token(subject=subject)
+        refresh_token = access_security.create_refresh_token(subject=subject)
+
+        access_security.set_access_cookie(response, access_token)
+        refresh_security.set_refresh_cookie(response, refresh_token)
+
+        return {"access_token": access_token, "refresh_token": refresh_token}
 
 
-client = TestClient(app)
+    @app.delete("/auth")
+    def logout(response: Response):
+        access_security.unset_access_cookie(response)
+        refresh_security.unset_refresh_cookie(response)
+
+        return {"msg": "Successful logout"}
+
+
+    return TestClient(app)
+
 
 openapi_schema = {
     "openapi": "3.1.0",
@@ -62,13 +68,17 @@ openapi_schema = {
 }
 
 
-def test_openapi_schema():
+@pytest.mark.parametrize("jwt_backend", [AuthlibJWTBackend, PythonJoseJWTBackend])
+def test_openapi_schema(jwt_backend):
+    client = create_example_client(jwt_backend)
     response = client.get("/openapi.json")
     assert response.status_code == 200, response.text
     assert response.json() == openapi_schema
 
 
-def test_security_jwt_auth():
+@pytest.mark.parametrize("jwt_backend", [AuthlibJWTBackend, PythonJoseJWTBackend])
+def test_security_jwt_auth(jwt_backend):
+    client = create_example_client(jwt_backend)
     response = client.post("/auth")
     assert response.status_code == 200, response.text
 
@@ -78,7 +88,9 @@ def test_security_jwt_auth():
     assert response.cookies["refresh_token_cookie"] == response.json()["refresh_token"]
 
 
-def test_security_jwt_logout():
+@pytest.mark.parametrize("jwt_backend", [AuthlibJWTBackend, PythonJoseJWTBackend])
+def test_security_jwt_logout(jwt_backend):
+    client = create_example_client(jwt_backend)
     response = client.delete("/auth")
     assert response.status_code == 200, response.text
 

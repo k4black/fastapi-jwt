@@ -1,40 +1,46 @@
+import pytest
 from fastapi import FastAPI, Security
 from fastapi.testclient import TestClient
 
 from fastapi_jwt import JwtAccessBearerCookie, JwtAuthorizationCredentials, JwtRefreshBearerCookie
-
-app = FastAPI()
-
-access_security = JwtAccessBearerCookie(secret_key="secret_key")
-refresh_security = JwtRefreshBearerCookie(secret_key="secret_key")
+from fastapi_jwt import AuthlibJWTBackend, PythonJoseJWTBackend, define_default_jwt_backend
 
 
-@app.post("/auth")
-def auth():
-    subject = {"username": "username", "role": "user"}
+def create_example_client(jwt_backend):
+    define_default_jwt_backend(jwt_backend)
+    app = FastAPI()
 
-    access_token = access_security.create_access_token(subject=subject)
-    refresh_token = access_security.create_refresh_token(subject=subject)
-
-    return {"access_token": access_token, "refresh_token": refresh_token}
+    access_security = JwtAccessBearerCookie(secret_key="secret_key")
+    refresh_security = JwtRefreshBearerCookie(secret_key="secret_key")
 
 
-@app.post("/refresh")
-def refresh(credentials: JwtAuthorizationCredentials = Security(refresh_security)):
-    access_token = refresh_security.create_access_token(subject=credentials.subject)
-    refresh_token = refresh_security.create_refresh_token(subject=credentials.subject)
+    @app.post("/auth")
+    def auth():
+        subject = {"username": "username", "role": "user"}
 
-    return {"access_token": access_token, "refresh_token": refresh_token}
+        access_token = access_security.create_access_token(subject=subject)
+        refresh_token = access_security.create_refresh_token(subject=subject)
 
-
-@app.get("/users/me")
-def read_current_user(
-    credentials: JwtAuthorizationCredentials = Security(access_security),
-):
-    return {"username": credentials["username"], "role": credentials["role"]}
+        return {"access_token": access_token, "refresh_token": refresh_token}
 
 
-client = TestClient(app)
+    @app.post("/refresh")
+    def refresh(credentials: JwtAuthorizationCredentials = Security(refresh_security)):
+        access_token = refresh_security.create_access_token(subject=credentials.subject)
+        refresh_token = refresh_security.create_refresh_token(subject=credentials.subject)
+
+        return {"access_token": access_token, "refresh_token": refresh_token}
+
+
+    @app.get("/users/me")
+    def read_current_user(
+        credentials: JwtAuthorizationCredentials = Security(access_security),
+    ):
+        return {"username": credentials["username"], "role": credentials["role"]}
+
+
+    return TestClient(app)
+
 
 openapi_schema = {
     "openapi": "3.1.0",
@@ -98,13 +104,17 @@ openapi_schema = {
 }
 
 
-def test_openapi_schema():
+@pytest.mark.parametrize("jwt_backend", [AuthlibJWTBackend, PythonJoseJWTBackend])
+def test_openapi_schema(jwt_backend):
+    client = create_example_client(jwt_backend)
     response = client.get("/openapi.json")
     assert response.status_code == 200, response.text
     assert response.json() == openapi_schema
 
 
-def test_security_jwt_access_both_correct():
+@pytest.mark.parametrize("jwt_backend", [AuthlibJWTBackend, PythonJoseJWTBackend])
+def test_security_jwt_access_both_correct(jwt_backend):
+    client = create_example_client(jwt_backend)
     access_token = client.post("/auth").json()["access_token"]
 
     response = client.get(
@@ -116,7 +126,9 @@ def test_security_jwt_access_both_correct():
     assert response.json() == {"username": "username", "role": "user"}
 
 
-def test_security_jwt_access_only_cookie():
+@pytest.mark.parametrize("jwt_backend", [AuthlibJWTBackend, PythonJoseJWTBackend])
+def test_security_jwt_access_only_cookie(jwt_backend):
+    client = create_example_client(jwt_backend)
     access_token = client.post("/auth").json()["access_token"]
 
     response = client.get("/users/me", cookies={"access_token_cookie": access_token})
@@ -124,7 +136,9 @@ def test_security_jwt_access_only_cookie():
     assert response.json() == {"username": "username", "role": "user"}
 
 
-def test_security_jwt_access_only_bearer():
+@pytest.mark.parametrize("jwt_backend", [AuthlibJWTBackend, PythonJoseJWTBackend])
+def test_security_jwt_access_only_bearer(jwt_backend):
+    client = create_example_client(jwt_backend)
     access_token = client.post("/auth").json()["access_token"]
 
     response = client.get(
@@ -134,7 +148,9 @@ def test_security_jwt_access_only_bearer():
     assert response.json() == {"username": "username", "role": "user"}
 
 
-def test_security_jwt_access_bearer_wrong_cookie_correct():
+@pytest.mark.parametrize("jwt_backend", [AuthlibJWTBackend, PythonJoseJWTBackend])
+def test_security_jwt_access_bearer_wrong_cookie_correct(jwt_backend):
+    client = create_example_client(jwt_backend)
     access_token = client.post("/auth").json()["access_token"]
 
     response = client.get(
@@ -146,7 +162,9 @@ def test_security_jwt_access_bearer_wrong_cookie_correct():
     assert response.json()["detail"].startswith("Wrong token:")
 
 
-def test_security_jwt_access_bearer_correct_cookie_wrong():
+@pytest.mark.parametrize("jwt_backend", [AuthlibJWTBackend, PythonJoseJWTBackend])
+def test_security_jwt_access_bearer_correct_cookie_wrong(jwt_backend):
+    client = create_example_client(jwt_backend)
     access_token = client.post("/auth").json()["access_token"]
 
     response = client.get(
@@ -158,20 +176,26 @@ def test_security_jwt_access_bearer_correct_cookie_wrong():
     assert response.json() == {"username": "username", "role": "user"}
 
 
-def test_security_jwt_access_both_no_credentials():
+@pytest.mark.parametrize("jwt_backend", [AuthlibJWTBackend, PythonJoseJWTBackend])
+def test_security_jwt_access_both_no_credentials(jwt_backend):
+    client = create_example_client(jwt_backend)
     response = client.get("/users/me")
     assert response.status_code == 401, response.text
     assert response.json() == {"detail": "Credentials are not provided"}
 
 
-def test_security_jwt_refresh_only_cookie():
+@pytest.mark.parametrize("jwt_backend", [AuthlibJWTBackend, PythonJoseJWTBackend])
+def test_security_jwt_refresh_only_cookie(jwt_backend):
+    client = create_example_client(jwt_backend)
     refresh_token = client.post("/auth").json()["refresh_token"]
 
     response = client.post("/refresh", cookies={"refresh_token_cookie": refresh_token})
     assert response.status_code == 200, response.text
 
 
-def test_security_jwt_refresh_bearer_correct_cookie_wrong():
+@pytest.mark.parametrize("jwt_backend", [AuthlibJWTBackend, PythonJoseJWTBackend])
+def test_security_jwt_refresh_bearer_correct_cookie_wrong(jwt_backend):
+    client = create_example_client(jwt_backend)
     refresh_token = client.post("/auth").json()["refresh_token"]
 
     response = client.post(
@@ -182,7 +206,9 @@ def test_security_jwt_refresh_bearer_correct_cookie_wrong():
     assert response.status_code == 200, response.text
 
 
-def test_security_jwt_refresh_bearer_wrong_cookie_correct():
+@pytest.mark.parametrize("jwt_backend", [AuthlibJWTBackend, PythonJoseJWTBackend])
+def test_security_jwt_refresh_bearer_wrong_cookie_correct(jwt_backend):
+    client = create_example_client(jwt_backend)
     refresh_token = client.post("/auth").json()["refresh_token"]
 
     response = client.post(
@@ -194,7 +220,9 @@ def test_security_jwt_refresh_bearer_wrong_cookie_correct():
     assert response.json()["detail"].startswith("Wrong token:")
 
 
-def test_security_jwt_refresh_cookie_wrong_using_access_token():
+@pytest.mark.parametrize("jwt_backend", [AuthlibJWTBackend, PythonJoseJWTBackend])
+def test_security_jwt_refresh_cookie_wrong_using_access_token(jwt_backend):
+    client = create_example_client(jwt_backend)
     tokens = client.post("/auth").json()
     access_token, refresh_token = tokens["access_token"], tokens["refresh_token"]
     assert access_token != refresh_token
@@ -204,7 +232,9 @@ def test_security_jwt_refresh_cookie_wrong_using_access_token():
     assert response.json()["detail"].startswith("Wrong token: 'type' is not 'refresh'")
 
 
-def test_security_jwt_refresh_both_no_credentials():
+@pytest.mark.parametrize("jwt_backend", [AuthlibJWTBackend, PythonJoseJWTBackend])
+def test_security_jwt_refresh_both_no_credentials(jwt_backend):
+    client = create_example_client(jwt_backend)
     response = client.post("/refresh")
     assert response.status_code == 401, response.text
     assert response.json() == {"detail": "Credentials are not provided"}
