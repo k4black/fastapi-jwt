@@ -1,20 +1,26 @@
-import pytest
 from typing import Optional
 
+import pytest
 from fastapi import FastAPI, Security
 from fastapi.testclient import TestClient
 
-from fastapi_jwt import JwtAccessCookie, JwtAuthorizationCredentials, JwtRefreshCookie
-from fastapi_jwt import AuthlibJWTBackend, PythonJoseJWTBackend, define_default_jwt_backend
+from fastapi_jwt import (
+    AuthlibJWTBackend,
+    JwtAccessCookie,
+    JwtAuthorizationCredentials,
+    JwtRefreshCookie,
+    PythonJoseJWTBackend,
+    define_default_jwt_backend,
+)
+from fastapi_jwt.jwt_backends import AbstractJWTBackend
 
 
-def create_example_client(jwt_backend):
+def create_example_client(jwt_backend: AbstractJWTBackend):
     define_default_jwt_backend(jwt_backend)
     app = FastAPI()
 
     access_security = JwtAccessCookie(secret_key="secret_key", auto_error=False)
     refresh_security = JwtRefreshCookie(secret_key="secret_key", auto_error=False)
-
 
     @app.post("/auth")
     def auth():
@@ -24,7 +30,6 @@ def create_example_client(jwt_backend):
         refresh_token = access_security.create_refresh_token(subject=subject)
 
         return {"access_token": access_token, "refresh_token": refresh_token}
-
 
     @app.post("/refresh")
     def refresh(
@@ -38,7 +43,6 @@ def create_example_client(jwt_backend):
 
         return {"access_token": access_token, "refresh_token": refresh_token}
 
-
     @app.get("/users/me")
     def read_current_user(
         credentials: Optional[JwtAuthorizationCredentials] = Security(access_security),
@@ -47,7 +51,6 @@ def create_example_client(jwt_backend):
             return {"msg": "Create an account first"}
 
         return {"username": credentials["username"], "role": credentials["role"]}
-
 
     return TestClient(app)
 
@@ -141,9 +144,7 @@ def test_security_jwt_access_cookie(jwt_backend):
 @pytest.mark.parametrize("jwt_backend", [AuthlibJWTBackend, PythonJoseJWTBackend])
 def test_security_jwt_access_cookie_wrong(jwt_backend):
     client = create_example_client(jwt_backend)
-    response = client.get(
-        "/users/me", cookies={"access_token_cookie": "wrong_access_token_cookie"}
-    )
+    response = client.get("/users/me", cookies={"access_token_cookie": "wrong_access_token_cookie"})
     assert response.status_code == 200, response.text
     assert response.json() == {"msg": "Create an account first"}
 
@@ -168,9 +169,7 @@ def test_security_jwt_refresh_cookie(jwt_backend):
 @pytest.mark.parametrize("jwt_backend", [AuthlibJWTBackend, PythonJoseJWTBackend])
 def test_security_jwt_refresh_cookie_wrong(jwt_backend):
     client = create_example_client(jwt_backend)
-    response = client.post(
-        "/refresh", cookies={"refresh_token_cookie": "wrong_refresh_token_cookie"}
-    )
+    response = client.post("/refresh", cookies={"refresh_token_cookie": "wrong_refresh_token_cookie"})
     assert response.status_code == 200, response.text
     assert response.json() == {"msg": "Create an account first"}
 

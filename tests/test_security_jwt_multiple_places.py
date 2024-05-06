@@ -2,17 +2,23 @@ import pytest
 from fastapi import FastAPI, Security
 from fastapi.testclient import TestClient
 
-from fastapi_jwt import JwtAccessBearerCookie, JwtAuthorizationCredentials, JwtRefreshBearerCookie
-from fastapi_jwt import AuthlibJWTBackend, PythonJoseJWTBackend, define_default_jwt_backend
+from fastapi_jwt import (
+    AuthlibJWTBackend,
+    JwtAccessBearerCookie,
+    JwtAuthorizationCredentials,
+    JwtRefreshBearerCookie,
+    PythonJoseJWTBackend,
+    define_default_jwt_backend,
+)
+from fastapi_jwt.jwt_backends import AbstractJWTBackend
 
 
-def create_example_client(jwt_backend):
+def create_example_client(jwt_backend: AbstractJWTBackend):
     define_default_jwt_backend(jwt_backend)
     app = FastAPI()
 
     access_security = JwtAccessBearerCookie(secret_key="secret_key")
     refresh_security = JwtRefreshBearerCookie(secret_key="secret_key")
-
 
     @app.post("/auth")
     def auth():
@@ -23,7 +29,6 @@ def create_example_client(jwt_backend):
 
         return {"access_token": access_token, "refresh_token": refresh_token}
 
-
     @app.post("/refresh")
     def refresh(credentials: JwtAuthorizationCredentials = Security(refresh_security)):
         access_token = refresh_security.create_access_token(subject=credentials.subject)
@@ -31,13 +36,11 @@ def create_example_client(jwt_backend):
 
         return {"access_token": access_token, "refresh_token": refresh_token}
 
-
     @app.get("/users/me")
     def read_current_user(
         credentials: JwtAuthorizationCredentials = Security(access_security),
     ):
         return {"username": credentials["username"], "role": credentials["role"]}
-
 
     return TestClient(app)
 
@@ -141,9 +144,7 @@ def test_security_jwt_access_only_bearer(jwt_backend):
     client = create_example_client(jwt_backend)
     access_token = client.post("/auth").json()["access_token"]
 
-    response = client.get(
-        "/users/me", headers={"Authorization": f"Bearer {access_token}"}
-    )
+    response = client.get("/users/me", headers={"Authorization": f"Bearer {access_token}"})
     assert response.status_code == 200, response.text
     assert response.json() == {"username": "username", "role": "user"}
 

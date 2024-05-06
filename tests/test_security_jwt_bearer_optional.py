@@ -4,17 +4,23 @@ import pytest
 from fastapi import FastAPI, Security
 from fastapi.testclient import TestClient
 
-from fastapi_jwt import JwtAccessBearer, JwtAuthorizationCredentials, JwtRefreshBearer
-from fastapi_jwt import AuthlibJWTBackend, PythonJoseJWTBackend, define_default_jwt_backend
+from fastapi_jwt import (
+    AuthlibJWTBackend,
+    JwtAccessBearer,
+    JwtAuthorizationCredentials,
+    JwtRefreshBearer,
+    PythonJoseJWTBackend,
+    define_default_jwt_backend,
+)
+from fastapi_jwt.jwt_backends import AbstractJWTBackend
 
 
-def create_example_client(jwt_backend):
+def create_example_client(jwt_backend: AbstractJWTBackend):
     define_default_jwt_backend(jwt_backend)
     app = FastAPI()
 
     access_security = JwtAccessBearer(secret_key="secret_key", auto_error=False)
     refresh_security = JwtRefreshBearer(secret_key="secret_key", auto_error=False)
-
 
     @app.post("/auth")
     def auth():
@@ -24,7 +30,6 @@ def create_example_client(jwt_backend):
         refresh_token = access_security.create_refresh_token(subject=subject)
 
         return {"access_token": access_token, "refresh_token": refresh_token}
-
 
     @app.post("/refresh")
     def refresh(
@@ -38,7 +43,6 @@ def create_example_client(jwt_backend):
 
         return {"access_token": access_token, "refresh_token": refresh_token}
 
-
     @app.get("/users/me")
     def read_current_user(
         credentials: Optional[JwtAuthorizationCredentials] = Security(access_security),
@@ -46,7 +50,6 @@ def create_example_client(jwt_backend):
         if credentials is None:
             return {"msg": "Create an account first"}
         return {"username": credentials["username"], "role": credentials["role"]}
-
 
     return TestClient(app)
 
@@ -123,9 +126,7 @@ def test_security_jwt_access_bearer(jwt_backend):
     client = create_example_client(jwt_backend)
     access_token = client.post("/auth").json()["access_token"]
 
-    response = client.get(
-        "/users/me", headers={"Authorization": f"Bearer {access_token}"}
-    )
+    response = client.get("/users/me", headers={"Authorization": f"Bearer {access_token}"})
     assert response.status_code == 200, response.text
     assert response.json() == {"username": "username", "role": "user"}
 
@@ -133,9 +134,7 @@ def test_security_jwt_access_bearer(jwt_backend):
 @pytest.mark.parametrize("jwt_backend", [AuthlibJWTBackend, PythonJoseJWTBackend])
 def test_security_jwt_access_bearer_wrong(jwt_backend):
     client = create_example_client(jwt_backend)
-    response = client.get(
-        "/users/me", headers={"Authorization": "Bearer wrong_access_token"}
-    )
+    response = client.get("/users/me", headers={"Authorization": "Bearer wrong_access_token"})
     assert response.status_code == 200, response.text
     assert response.json() == {"msg": "Create an account first"}
 
@@ -161,18 +160,14 @@ def test_security_jwt_refresh_bearer(jwt_backend):
     client = create_example_client(jwt_backend)
     refresh_token = client.post("/auth").json()["refresh_token"]
 
-    response = client.post(
-        "/refresh", headers={"Authorization": f"Bearer {refresh_token}"}
-    )
+    response = client.post("/refresh", headers={"Authorization": f"Bearer {refresh_token}"})
     assert response.status_code == 200, response.text
 
 
 @pytest.mark.parametrize("jwt_backend", [AuthlibJWTBackend, PythonJoseJWTBackend])
 def test_security_jwt_refresh_bearer_wrong(jwt_backend):
     client = create_example_client(jwt_backend)
-    response = client.post(
-        "/refresh", headers={"Authorization": "Bearer wrong_refresh_token"}
-    )
+    response = client.post("/refresh", headers={"Authorization": "Bearer wrong_refresh_token"})
     assert response.status_code == 200, response.text
     assert response.json() == {"msg": "Create an account first"}
 

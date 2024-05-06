@@ -3,14 +3,12 @@ import time
 
 from fastapi_jwt import AuthlibJWTBackend, PythonJoseJWTBackend
 
-
 _time = time.time
 _now = datetime.datetime.now
 _utcnow = datetime.datetime.utcnow
 
 
 def create_datetime_mock(**timedelta_kwargs):
-
     class _FakeDateTime(datetime.datetime):  # pragma: no cover
         @staticmethod
         def now(**kwargs):
