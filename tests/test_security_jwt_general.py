@@ -1,84 +1,62 @@
-import datetime
-from typing import Set
+from typing import Set, Type
 from uuid import uuid4
 
 from fastapi import FastAPI, Security
 from fastapi.testclient import TestClient
 from pytest_mock import MockerFixture
 
-from fastapi_jwt import JwtAccessBearer, JwtAuthorizationCredentials, JwtRefreshBearer
+from fastapi_jwt import JwtAccessBearer, JwtAuthorizationCredentials, JwtRefreshBearer, force_jwt_backend
+from fastapi_jwt.jwt_backends import AbstractJWTBackend
 
-app = FastAPI()
-
-access_security = JwtAccessBearer(secret_key="secret_key")
-refresh_security = JwtRefreshBearer.from_other(access_security)
+from .mock_datetime_utils import mock_now_for_backend
 
 
-unique_identifiers_database: Set[str] = set()
+def create_example_client(jwt_backend: Type[AbstractJWTBackend]):
+    force_jwt_backend(jwt_backend)
+    app = FastAPI()
 
+    access_security = JwtAccessBearer(secret_key="secret_key")
+    refresh_security = JwtRefreshBearer.from_other(access_security)
+    unique_identifiers_database: Set[str] = set()
 
-@app.post("/auth")
-def auth():
-    subject = {"username": "username", "role": "user"}
-    unique_identifier = str(uuid4())
-    unique_identifiers_database.add(unique_identifier)
+    @app.post("/auth")
+    def auth():
+        subject = {"username": "username", "role": "user"}
+        unique_identifier = str(uuid4())
+        unique_identifiers_database.add(unique_identifier)
 
-    access_token = access_security.create_access_token(
-        subject=subject, unique_identifier=unique_identifier
-    )
-    refresh_token = access_security.create_refresh_token(subject=subject)
+        access_token = access_security.create_access_token(subject=subject, unique_identifier=unique_identifier)
+        refresh_token = access_security.create_refresh_token(subject=subject)
 
-    return {"access_token": access_token, "refresh_token": refresh_token}
+        return {"access_token": access_token, "refresh_token": refresh_token}
 
+    @app.post("/refresh")
+    def refresh(credentials: JwtAuthorizationCredentials = Security(refresh_security)):
+        unique_identifier = str(uuid4())
+        unique_identifiers_database.add(unique_identifier)
 
-@app.post("/refresh")
-def refresh(credentials: JwtAuthorizationCredentials = Security(refresh_security)):
-    unique_identifier = str(uuid4())
-    unique_identifiers_database.add(unique_identifier)
+        access_token = refresh_security.create_access_token(
+            subject=credentials.subject,
+            unique_identifier=unique_identifier,
+        )
+        refresh_token = refresh_security.create_refresh_token(subject=credentials.subject)
 
-    access_token = refresh_security.create_access_token(
-        subject=credentials.subject, unique_identifier=unique_identifier,
-    )
-    refresh_token = refresh_security.create_refresh_token(subject=credentials.subject)
+        return {"access_token": access_token, "refresh_token": refresh_token}
 
-    return {"access_token": access_token, "refresh_token": refresh_token}
+    @app.get("/users/me")
+    def read_current_user(
+        credentials: JwtAuthorizationCredentials = Security(access_security),
+    ):
+        return {"username": credentials["username"], "role": credentials["role"]}
 
+    @app.get("/auth/meta")
+    def get_token_meta(
+        credentials: JwtAuthorizationCredentials = Security(access_security),
+    ):
+        return {"jti": credentials.jti}
 
-@app.get("/users/me")
-def read_current_user(
-    credentials: JwtAuthorizationCredentials = Security(access_security),
-):
-    return {"username": credentials["username"], "role": credentials["role"]}
+    return TestClient(app), unique_identifiers_database
 
-
-@app.get("/auth/meta")
-def get_token_meta(
-    credentials: JwtAuthorizationCredentials = Security(access_security),
-):
-    return {"jti": credentials.jti}
-
-
-class _FakeDateTimeShort(datetime.datetime):  # pragma: no cover
-    @staticmethod
-    def now(**kwargs):
-        return datetime.datetime.now() + datetime.timedelta(minutes=3)
-
-    @staticmethod
-    def utcnow(**kwargs):
-        return datetime.datetime.utcnow() + datetime.timedelta(minutes=3)
-
-
-class _FakeDateTimeLong(datetime.datetime):  # pragma: no cover
-    @staticmethod
-    def now(**kwargs):
-        return datetime.datetime.now() + datetime.timedelta(days=42)
-
-    @staticmethod
-    def utcnow(**kwargs):
-        return datetime.datetime.utcnow() + datetime.timedelta(days=42)
-
-
-client = TestClient(app)
 
 openapi_schema = {
     "openapi": "3.1.0",
@@ -145,137 +123,113 @@ openapi_schema = {
 }
 
 
-def test_openapi_schema():
+def test_openapi_schema(jwt_backend: Type[AbstractJWTBackend]):
+    client, _ = create_example_client(jwt_backend)
     response = client.get("/openapi.json")
     assert response.status_code == 200, response.text
     assert response.json() == openapi_schema
 
 
-def test_security_jwt_access_token():
+def test_security_jwt_access_token(jwt_backend: Type[AbstractJWTBackend]):
+    client, _ = create_example_client(jwt_backend)
     access_token = client.post("/auth").json()["access_token"]
 
-    response = client.get(
-        "/users/me", headers={"Authorization": f"Bearer {access_token}"}
-    )
+    response = client.get("/users/me", headers={"Authorization": f"Bearer {access_token}"})
     assert response.status_code == 200, response.text
     assert response.json() == {"username": "username", "role": "user"}
 
 
-def test_security_jwt_access_token_wrong():
-    response = client.get(
-        "/users/me", headers={"Authorization": "Bearer wrong_access_token"}
-    )
+def test_security_jwt_access_token_wrong(jwt_backend: Type[AbstractJWTBackend]):
+    client, _ = create_example_client(jwt_backend)
+    response = client.get("/users/me", headers={"Authorization": "Bearer wrong_access_token"})
     assert response.status_code == 401, response.text
-    assert response.json()["detail"].startswith("Wrong token:")
+    assert response.json()["detail"].startswith("Invalid token:")
 
-    response = client.get(
-        "/users/me", headers={"Authorization": "Bearer wrong.access.token"}
-    )
+    response = client.get("/users/me", headers={"Authorization": "Bearer wrong.access.token"})
     assert response.status_code == 401, response.text
-    assert response.json()["detail"].startswith("Wrong token:")
+    assert response.json()["detail"].startswith("Invalid token:")
 
 
-def test_security_jwt_access_token_changed():
+def test_security_jwt_access_token_changed(jwt_backend: Type[AbstractJWTBackend]):
+    client, _ = create_example_client(jwt_backend)
     access_token = client.post("/auth").json()["access_token"]
 
     access_token = access_token.split(".")[0] + ".wrong." + access_token.split(".")[-1]
 
-    response = client.get(
-        "/users/me", headers={"Authorization": f"Bearer {access_token}"}
-    )
+    response = client.get("/users/me", headers={"Authorization": f"Bearer {access_token}"})
     assert response.status_code == 401, response.text
-    assert response.json()["detail"].startswith("Wrong token:")
+    assert response.json()["detail"].startswith("Invalid token:")
 
 
-def test_security_jwt_access_token_expiration(mocker: MockerFixture):
+def test_security_jwt_access_token_expiration(mocker: MockerFixture, jwt_backend):
+    client, _ = create_example_client(jwt_backend)
     access_token = client.post("/auth").json()["access_token"]
 
-    mocker.patch("jose.jwt.datetime", _FakeDateTimeShort)  # 3 min left
-
-    response = client.get(
-        "/users/me", headers={"Authorization": f"Bearer {access_token}"}
-    )
+    mock_now_for_backend(mocker, jwt_backend, minutes=3)  # 3 min left
+    response = client.get("/users/me", headers={"Authorization": f"Bearer {access_token}"})
     assert response.status_code == 200, response.text
 
-    mocker.patch("jose.jwt.datetime", _FakeDateTimeLong)  # 42 days left
-
-    response = client.get(
-        "/users/me", headers={"Authorization": f"Bearer {access_token}"}
-    )
+    mock_now_for_backend(mocker, jwt_backend, days=42)  # 42 days left
+    response = client.get("/users/me", headers={"Authorization": f"Bearer {access_token}"})
     assert response.status_code == 401, response.text
-    assert response.json()["detail"].startswith(
-        "Token time expired: Signature has expired"
-    )
+    assert response.json()["detail"].startswith("Token time expired:")
 
 
-def test_security_jwt_refresh_token():
+def test_security_jwt_refresh_token(jwt_backend: Type[AbstractJWTBackend]):
+    client, _ = create_example_client(jwt_backend)
     refresh_token = client.post("/auth").json()["refresh_token"]
 
-    response = client.post(
-        "/refresh", headers={"Authorization": f"Bearer {refresh_token}"}
-    )
+    response = client.post("/refresh", headers={"Authorization": f"Bearer {refresh_token}"})
     assert response.status_code == 200, response.text
 
 
-def test_security_jwt_refresh_token_wrong():
-    response = client.post(
-        "/refresh", headers={"Authorization": "Bearer wrong_refresh_token"}
-    )
+def test_security_jwt_refresh_token_wrong(jwt_backend: Type[AbstractJWTBackend]):
+    client, _ = create_example_client(jwt_backend)
+    response = client.post("/refresh", headers={"Authorization": "Bearer wrong_refresh_token"})
     assert response.status_code == 401, response.text
-    assert response.json()["detail"].startswith("Wrong token:")
+    assert response.json()["detail"].startswith("Invalid token:")
 
-    response = client.post(
-        "/refresh", headers={"Authorization": "Bearer wrong.refresh.token"}
-    )
+    response = client.post("/refresh", headers={"Authorization": "Bearer wrong.refresh.token"})
     assert response.status_code == 401, response.text
-    assert response.json()["detail"].startswith("Wrong token:")
+    assert response.json()["detail"].startswith("Invalid token:")
 
 
-def test_security_jwt_refresh_token_using_access_token():
+def test_security_jwt_refresh_token_using_access_token(jwt_backend: Type[AbstractJWTBackend]):
+    client, _ = create_example_client(jwt_backend)
     tokens = client.post("/auth").json()
     access_token, refresh_token = tokens["access_token"], tokens["refresh_token"]
     assert access_token != refresh_token
 
-    response = client.post(
-        "/refresh", headers={"Authorization": f"Bearer {access_token}"}
-    )
+    response = client.post("/refresh", headers={"Authorization": f"Bearer {access_token}"})
     assert response.status_code == 401, response.text
-    assert response.json()["detail"].startswith("Wrong token: 'type' is not 'refresh'")
+    assert response.json()["detail"].startswith("Invalid token: 'type' is not 'refresh'")
 
 
-def test_security_jwt_refresh_token_changed():
+def test_security_jwt_refresh_token_changed(jwt_backend: Type[AbstractJWTBackend]):
+    client, _ = create_example_client(jwt_backend)
     refresh_token = client.post("/auth").json()["refresh_token"]
 
-    refresh_token = (
-        refresh_token.split(".")[0] + ".wrong." + refresh_token.split(".")[-1]
-    )
+    refresh_token = refresh_token.split(".")[0] + ".wrong." + refresh_token.split(".")[-1]
 
-    response = client.post(
-        "/refresh", headers={"Authorization": f"Bearer {refresh_token}"}
-    )
+    response = client.post("/refresh", headers={"Authorization": f"Bearer {refresh_token}"})
     assert response.status_code == 401, response.text
-    assert response.json()["detail"].startswith("Wrong token:")
+    assert response.json()["detail"].startswith("Invalid token:")
 
 
-def test_security_jwt_refresh_token_expired(mocker: MockerFixture):
+def test_security_jwt_refresh_token_expired(mocker: MockerFixture, jwt_backend):
+    client, _ = create_example_client(jwt_backend)
     refresh_token = client.post("/auth").json()["refresh_token"]
 
-    mocker.patch("jose.jwt.datetime", _FakeDateTimeLong)  # 42 days left
-
-    response = client.post(
-        "/refresh", headers={"Authorization": f"Bearer {refresh_token}"}
-    )
+    mock_now_for_backend(mocker, jwt_backend, days=42)  # 42 days left
+    response = client.post("/refresh", headers={"Authorization": f"Bearer {refresh_token}"})
     assert response.status_code == 401, response.text
-    assert response.json()["detail"].startswith(
-        "Token time expired: Signature has expired"
-    )
+    assert response.json()["detail"].startswith("Token time expired:")
 
 
-def test_security_jwt_custom_jti():
+def test_security_jwt_custom_jti(jwt_backend: Type[AbstractJWTBackend]):
+    client, unique_identifiers_database = create_example_client(jwt_backend)
     access_token = client.post("/auth").json()["access_token"]
 
-    response = client.get(
-        "/auth/meta", headers={"Authorization": f"Bearer {access_token}"}
-    )
+    response = client.get("/auth/meta", headers={"Authorization": f"Bearer {access_token}"})
     assert response.status_code == 200, response.text
     assert response.json()["jti"] in unique_identifiers_database
