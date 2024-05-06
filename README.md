@@ -25,9 +25,14 @@ FastAPI native extension, easy and simple JWT auth
 ## Installation
 You can access package [fastapi-jwt in pypi](https://pypi.org/project/fastapi-jwt/)
 ```shell
-pip install fastapi-jwt
+pip install fastapi-jwt[authlib]
+# or
+pip install fastapi-jwt[python_jose]
 ```
 
+The fastapi-jwt will choose the backend automatically if library is installed with the following priority:
+1. authlib
+2. python_jose (deprecated)
 
 ## Usage
 This library made in fastapi style, so it can be used as standard security features 
@@ -81,7 +86,7 @@ There it is open and maintained [Pull Request #3305](https://github.com/tiangolo
 ## Requirements 
 
 * `fastapi`
-* `python-jose[cryptography]`
+* `authlib` or `python-jose[cryptography]` (deprecated)
 
 ## License
 This project is licensed under the terms of the MIT license.
