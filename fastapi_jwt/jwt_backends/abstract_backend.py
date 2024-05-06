@@ -1,5 +1,5 @@
-from abc import ABCMeta, abstractmethod, abstractproperty
-from typing import Any, Dict, Optional, Self
+from abc import ABCMeta, abstractmethod
+from typing import Any, Dict, Optional
 
 
 class AbstractJWTBackend(metaclass=ABCMeta):
