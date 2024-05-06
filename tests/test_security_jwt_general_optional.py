@@ -1,26 +1,18 @@
-from typing import Optional, Set
+from typing import Optional, Set, Type
 from uuid import uuid4
 
-import pytest
 from fastapi import FastAPI, Security
 from fastapi.testclient import TestClient
 from pytest_mock import MockerFixture
 
-from fastapi_jwt import (
-    AuthlibJWTBackend,
-    JwtAccessBearer,
-    JwtAuthorizationCredentials,
-    JwtRefreshBearer,
-    PythonJoseJWTBackend,
-    define_default_jwt_backend,
-)
+from fastapi_jwt import JwtAccessBearer, JwtAuthorizationCredentials, JwtRefreshBearer, force_jwt_backend
 from fastapi_jwt.jwt_backends import AbstractJWTBackend
 
 from .mock_datetime_utils import mock_now_for_backend
 
 
-def create_example_client(jwt_backend: AbstractJWTBackend):
-    define_default_jwt_backend(jwt_backend)
+def create_example_client(jwt_backend: Type[AbstractJWTBackend]):
+    force_jwt_backend(jwt_backend)
     app = FastAPI()
 
     access_security = JwtAccessBearer(secret_key="secret_key", auto_error=False)
@@ -140,16 +132,14 @@ openapi_schema = {
 }
 
 
-@pytest.mark.parametrize("jwt_backend", [AuthlibJWTBackend, PythonJoseJWTBackend])
-def test_openapi_schema(jwt_backend):
+def test_openapi_schema(jwt_backend: Type[AbstractJWTBackend]):
     client, _ = create_example_client(jwt_backend)
     response = client.get("/openapi.json")
     assert response.status_code == 200, response.text
     assert response.json() == openapi_schema
 
 
-@pytest.mark.parametrize("jwt_backend", [AuthlibJWTBackend, PythonJoseJWTBackend])
-def test_security_jwt_access_token(jwt_backend):
+def test_security_jwt_access_token(jwt_backend: Type[AbstractJWTBackend]):
     client, _ = create_example_client(jwt_backend)
     access_token = client.post("/auth").json()["access_token"]
 
@@ -158,8 +148,7 @@ def test_security_jwt_access_token(jwt_backend):
     assert response.json() == {"username": "username", "role": "user"}
 
 
-@pytest.mark.parametrize("jwt_backend", [AuthlibJWTBackend, PythonJoseJWTBackend])
-def test_security_jwt_access_token_wrong(jwt_backend):
+def test_security_jwt_access_token_wrong(jwt_backend: Type[AbstractJWTBackend]):
     client, _ = create_example_client(jwt_backend)
     response = client.get("/users/me", headers={"Authorization": "Bearer wrong_access_token"})
     assert response.status_code == 200, response.text
@@ -170,8 +159,7 @@ def test_security_jwt_access_token_wrong(jwt_backend):
     assert response.json() == {"msg": "Create an account first"}
 
 
-@pytest.mark.parametrize("jwt_backend", [AuthlibJWTBackend, PythonJoseJWTBackend])
-def test_security_jwt_access_token_changed(jwt_backend):
+def test_security_jwt_access_token_changed(jwt_backend: Type[AbstractJWTBackend]):
     client, _ = create_example_client(jwt_backend)
     access_token = client.post("/auth").json()["access_token"]
 
@@ -182,7 +170,6 @@ def test_security_jwt_access_token_changed(jwt_backend):
     assert response.json() == {"msg": "Create an account first"}
 
 
-@pytest.mark.parametrize("jwt_backend", [AuthlibJWTBackend, PythonJoseJWTBackend])
 def test_security_jwt_access_token_expiration(mocker: MockerFixture, jwt_backend):
     client, _ = create_example_client(jwt_backend)
     access_token = client.post("/auth").json()["access_token"]
@@ -198,8 +185,7 @@ def test_security_jwt_access_token_expiration(mocker: MockerFixture, jwt_backend
     assert response.json() == {"msg": "Create an account first"}
 
 
-@pytest.mark.parametrize("jwt_backend", [AuthlibJWTBackend, PythonJoseJWTBackend])
-def test_security_jwt_refresh_token(jwt_backend):
+def test_security_jwt_refresh_token(jwt_backend: Type[AbstractJWTBackend]):
     client, _ = create_example_client(jwt_backend)
     refresh_token = client.post("/auth").json()["refresh_token"]
 
@@ -208,8 +194,7 @@ def test_security_jwt_refresh_token(jwt_backend):
     assert "msg" not in response.json()
 
 
-@pytest.mark.parametrize("jwt_backend", [AuthlibJWTBackend, PythonJoseJWTBackend])
-def test_security_jwt_refresh_token_wrong(jwt_backend):
+def test_security_jwt_refresh_token_wrong(jwt_backend: Type[AbstractJWTBackend]):
     client, _ = create_example_client(jwt_backend)
     response = client.post("/refresh", headers={"Authorization": "Bearer wrong_refresh_token"})
     assert response.status_code == 200, response.text
@@ -220,8 +205,7 @@ def test_security_jwt_refresh_token_wrong(jwt_backend):
     assert response.json() == {"msg": "Create an account first"}
 
 
-@pytest.mark.parametrize("jwt_backend", [AuthlibJWTBackend, PythonJoseJWTBackend])
-def test_security_jwt_refresh_token_using_access_token(jwt_backend):
+def test_security_jwt_refresh_token_using_access_token(jwt_backend: Type[AbstractJWTBackend]):
     client, _ = create_example_client(jwt_backend)
     tokens = client.post("/auth").json()
     access_token, refresh_token = tokens["access_token"], tokens["refresh_token"]
@@ -232,8 +216,7 @@ def test_security_jwt_refresh_token_using_access_token(jwt_backend):
     assert response.json() == {"msg": "Create an account first"}
 
 
-@pytest.mark.parametrize("jwt_backend", [AuthlibJWTBackend, PythonJoseJWTBackend])
-def test_security_jwt_refresh_token_changed(jwt_backend):
+def test_security_jwt_refresh_token_changed(jwt_backend: Type[AbstractJWTBackend]):
     client, _ = create_example_client(jwt_backend)
     refresh_token = client.post("/auth").json()["refresh_token"]
 
@@ -244,7 +227,6 @@ def test_security_jwt_refresh_token_changed(jwt_backend):
     assert response.json() == {"msg": "Create an account first"}
 
 
-@pytest.mark.parametrize("jwt_backend", [AuthlibJWTBackend, PythonJoseJWTBackend])
 def test_security_jwt_refresh_token_expired(mocker: MockerFixture, jwt_backend):
     client, _ = create_example_client(jwt_backend)
     refresh_token = client.post("/auth").json()["refresh_token"]
@@ -255,8 +237,7 @@ def test_security_jwt_refresh_token_expired(mocker: MockerFixture, jwt_backend):
     assert response.json() == {"msg": "Create an account first"}
 
 
-@pytest.mark.parametrize("jwt_backend", [AuthlibJWTBackend, PythonJoseJWTBackend])
-def test_security_jwt_custom_jti(jwt_backend):
+def test_security_jwt_custom_jti(jwt_backend: Type[AbstractJWTBackend]):
     client, unique_identifiers_database = create_example_client(jwt_backend)
     access_token = client.post("/auth").json()["access_token"]
 

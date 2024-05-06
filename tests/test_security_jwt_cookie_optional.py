@@ -1,22 +1,14 @@
-from typing import Optional
+from typing import Optional, Type
 
-import pytest
 from fastapi import FastAPI, Security
 from fastapi.testclient import TestClient
 
-from fastapi_jwt import (
-    AuthlibJWTBackend,
-    JwtAccessCookie,
-    JwtAuthorizationCredentials,
-    JwtRefreshCookie,
-    PythonJoseJWTBackend,
-    define_default_jwt_backend,
-)
+from fastapi_jwt import JwtAccessCookie, JwtAuthorizationCredentials, JwtRefreshCookie, force_jwt_backend
 from fastapi_jwt.jwt_backends import AbstractJWTBackend
 
 
-def create_example_client(jwt_backend: AbstractJWTBackend):
-    define_default_jwt_backend(jwt_backend)
+def create_example_client(jwt_backend: Type[AbstractJWTBackend]):
+    force_jwt_backend(jwt_backend)
     app = FastAPI()
 
     access_security = JwtAccessCookie(secret_key="secret_key", auto_error=False)
@@ -115,23 +107,20 @@ openapi_schema = {
 }
 
 
-@pytest.mark.parametrize("jwt_backend", [AuthlibJWTBackend, PythonJoseJWTBackend])
-def test_openapi_schema(jwt_backend):
+def test_openapi_schema(jwt_backend: Type[AbstractJWTBackend]):
     client = create_example_client(jwt_backend)
     response = client.get("/openapi.json")
     assert response.status_code == 200, response.text
     assert response.json() == openapi_schema
 
 
-@pytest.mark.parametrize("jwt_backend", [AuthlibJWTBackend, PythonJoseJWTBackend])
-def test_security_jwt_auth(jwt_backend):
+def test_security_jwt_auth(jwt_backend: Type[AbstractJWTBackend]):
     client = create_example_client(jwt_backend)
     response = client.post("/auth")
     assert response.status_code == 200, response.text
 
 
-@pytest.mark.parametrize("jwt_backend", [AuthlibJWTBackend, PythonJoseJWTBackend])
-def test_security_jwt_access_cookie(jwt_backend):
+def test_security_jwt_access_cookie(jwt_backend: Type[AbstractJWTBackend]):
     client = create_example_client(jwt_backend)
     client.cookies.clear()
     access_token = client.post("/auth").json()["access_token"]
@@ -141,24 +130,21 @@ def test_security_jwt_access_cookie(jwt_backend):
     assert response.json() == {"username": "username", "role": "user"}
 
 
-@pytest.mark.parametrize("jwt_backend", [AuthlibJWTBackend, PythonJoseJWTBackend])
-def test_security_jwt_access_cookie_wrong(jwt_backend):
+def test_security_jwt_access_cookie_wrong(jwt_backend: Type[AbstractJWTBackend]):
     client = create_example_client(jwt_backend)
     response = client.get("/users/me", cookies={"access_token_cookie": "wrong_access_token_cookie"})
     assert response.status_code == 200, response.text
     assert response.json() == {"msg": "Create an account first"}
 
 
-@pytest.mark.parametrize("jwt_backend", [AuthlibJWTBackend, PythonJoseJWTBackend])
-def test_security_jwt_access_cookie_no_credentials(jwt_backend):
+def test_security_jwt_access_cookie_no_credentials(jwt_backend: Type[AbstractJWTBackend]):
     client = create_example_client(jwt_backend)
     response = client.get("/users/me", cookies={})
     assert response.status_code == 200, response.text
     assert response.json() == {"msg": "Create an account first"}
 
 
-@pytest.mark.parametrize("jwt_backend", [AuthlibJWTBackend, PythonJoseJWTBackend])
-def test_security_jwt_refresh_cookie(jwt_backend):
+def test_security_jwt_refresh_cookie(jwt_backend: Type[AbstractJWTBackend]):
     client = create_example_client(jwt_backend)
     refresh_token = client.post("/auth").json()["refresh_token"]
 
@@ -166,16 +152,14 @@ def test_security_jwt_refresh_cookie(jwt_backend):
     assert response.status_code == 200, response.text
 
 
-@pytest.mark.parametrize("jwt_backend", [AuthlibJWTBackend, PythonJoseJWTBackend])
-def test_security_jwt_refresh_cookie_wrong(jwt_backend):
+def test_security_jwt_refresh_cookie_wrong(jwt_backend: Type[AbstractJWTBackend]):
     client = create_example_client(jwt_backend)
     response = client.post("/refresh", cookies={"refresh_token_cookie": "wrong_refresh_token_cookie"})
     assert response.status_code == 200, response.text
     assert response.json() == {"msg": "Create an account first"}
 
 
-@pytest.mark.parametrize("jwt_backend", [AuthlibJWTBackend, PythonJoseJWTBackend])
-def test_security_jwt_refresh_cookie_no_credentials(jwt_backend):
+def test_security_jwt_refresh_cookie_no_credentials(jwt_backend: Type[AbstractJWTBackend]):
     client = create_example_client(jwt_backend)
     response = client.post("/refresh", cookies={})
     assert response.status_code == 200, response.text

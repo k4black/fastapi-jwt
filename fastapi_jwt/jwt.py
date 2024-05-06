@@ -9,22 +9,21 @@ from fastapi.responses import Response
 from fastapi.security import APIKeyCookie, HTTPBearer
 from starlette.status import HTTP_401_UNAUTHORIZED
 
-from .jwt_backends import AbstractJWTBackend, AuthlibJWTBackend, PythonJoseJWTBackend
+from .jwt_backends import AbstractJWTBackend, authlib_backend, python_jose_backend
+from .jwt_backends.abstract_backend import BackendException
 
 DEFAULT_JWT_BACKEND: Optional[Type[AbstractJWTBackend]] = None
-
-
-def define_default_jwt_backend(cls: Type[AbstractJWTBackend]) -> None:
-    global DEFAULT_JWT_BACKEND
-    DEFAULT_JWT_BACKEND = cls
-
-
-if AuthlibJWTBackend is not None:
-    DEFAULT_JWT_BACKEND = AuthlibJWTBackend
-elif PythonJoseJWTBackend is not None:
-    DEFAULT_JWT_BACKEND = PythonJoseJWTBackend
+if authlib_backend.authlib_jose is not None:
+    DEFAULT_JWT_BACKEND = authlib_backend.AuthlibJWTBackend
+elif python_jose_backend.jose is not None:
+    DEFAULT_JWT_BACKEND = python_jose_backend.PythonJoseJWTBackend
 else:  # pragma: nocover
     raise ImportError("No JWT backend found, please install 'python-jose' or 'authlib'")
+
+
+def force_jwt_backend(cls: Type[AbstractJWTBackend]) -> None:
+    global DEFAULT_JWT_BACKEND
+    DEFAULT_JWT_BACKEND = cls
 
 
 def utcnow() -> datetime:
@@ -39,7 +38,7 @@ def utcnow() -> datetime:
 
 
 __all__ = [
-    "define_default_jwt_backend",
+    "force_jwt_backend",
     "JwtAuthorizationCredentials",
     "JwtAccessBearer",
     "JwtAccessCookie",
@@ -89,10 +88,9 @@ class JwtAuthBase(ABC):
 
         self.jwt_backend = DEFAULT_JWT_BACKEND(algorithm)
         self.secret_key = secret_key
-        if places:
-            assert places.issubset({"header", "cookie"}), "only 'header'/'cookie' are supported"
 
         self.places = places or {"header"}
+        assert self.places.issubset({"header", "cookie"}), "only 'header' and/or 'cookie' places are supported"
         self.auto_error = auto_error
         self.access_expires_delta = access_expires_delta or timedelta(minutes=15)
         self.refresh_expires_delta = refresh_expires_delta or timedelta(days=31)
@@ -152,7 +150,13 @@ class JwtAuthBase(ABC):
                 return None
 
         # Try to decode jwt token. auto_error on error
-        return self.jwt_backend.decode(token, self.secret_key, self.auto_error)
+        try:
+            return self.jwt_backend.decode(token, self.secret_key)
+        except BackendException as e:
+            if self.auto_error:
+                raise HTTPException(status_code=HTTP_401_UNAUTHORIZED, detail=str(e))
+            else:
+                return None
 
     def create_access_token(
         self,
@@ -354,7 +358,7 @@ class JwtRefresh(JwtAuthBase):
             if self.auto_error:
                 raise HTTPException(
                     status_code=HTTP_401_UNAUTHORIZED,
-                    detail="Wrong token: 'type' is not 'refresh'",
+                    detail="Invalid token: 'type' is not 'refresh'",
                 )
             else:
                 return None

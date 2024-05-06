@@ -1,19 +1,14 @@
-import pytest
+from typing import Type
+
 from fastapi import FastAPI, Response
 from fastapi.testclient import TestClient
 
-from fastapi_jwt import (
-    AuthlibJWTBackend,
-    JwtAccessCookie,
-    JwtRefreshCookie,
-    PythonJoseJWTBackend,
-    define_default_jwt_backend,
-)
+from fastapi_jwt import JwtAccessCookie, JwtRefreshCookie, force_jwt_backend
 from fastapi_jwt.jwt_backends import AbstractJWTBackend
 
 
-def create_example_client(jwt_backend: AbstractJWTBackend):
-    define_default_jwt_backend(jwt_backend)
+def create_example_client(jwt_backend: Type[AbstractJWTBackend]):
+    force_jwt_backend(jwt_backend)
     app = FastAPI()
 
     access_security = JwtAccessCookie(secret_key="secret_key")
@@ -71,16 +66,14 @@ openapi_schema = {
 }
 
 
-@pytest.mark.parametrize("jwt_backend", [AuthlibJWTBackend, PythonJoseJWTBackend])
-def test_openapi_schema(jwt_backend):
+def test_openapi_schema(jwt_backend: Type[AbstractJWTBackend]):
     client = create_example_client(jwt_backend)
     response = client.get("/openapi.json")
     assert response.status_code == 200, response.text
     assert response.json() == openapi_schema
 
 
-@pytest.mark.parametrize("jwt_backend", [AuthlibJWTBackend, PythonJoseJWTBackend])
-def test_security_jwt_auth(jwt_backend):
+def test_security_jwt_auth(jwt_backend: Type[AbstractJWTBackend]):
     client = create_example_client(jwt_backend)
     response = client.post("/auth")
     assert response.status_code == 200, response.text
@@ -91,8 +84,7 @@ def test_security_jwt_auth(jwt_backend):
     assert response.cookies["refresh_token_cookie"] == response.json()["refresh_token"]
 
 
-@pytest.mark.parametrize("jwt_backend", [AuthlibJWTBackend, PythonJoseJWTBackend])
-def test_security_jwt_logout(jwt_backend):
+def test_security_jwt_logout(jwt_backend: Type[AbstractJWTBackend]):
     client = create_example_client(jwt_backend)
     response = client.delete("/auth")
     assert response.status_code == 200, response.text

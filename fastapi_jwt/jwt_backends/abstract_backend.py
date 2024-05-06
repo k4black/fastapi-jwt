@@ -1,24 +1,14 @@
-from abc import ABCMeta, abstractmethod
+from abc import ABC, abstractmethod
 from typing import Any, Dict, Optional
 
 
-class AbstractJWTBackend(metaclass=ABCMeta):
-    # simple "SingletonArgs" implementation to keep a JWTBackend per algorithm
-    _instances: Dict[Any, "AbstractJWTBackend"] = {}
+class BackendException(Exception):
+    pass
 
-    def __new__(cls, algorithm: Optional[str]) -> "AbstractJWTBackend":
-        instance_key = (cls, algorithm)
-        if instance_key not in cls._instances:
-            cls._instances[instance_key] = super(AbstractJWTBackend, cls).__new__(cls)
-        return cls._instances[instance_key]
 
+class AbstractJWTBackend(ABC):
     @abstractmethod
-    def __init__(self, algorithm: Optional[str]) -> None:
-        raise NotImplementedError
-
-    @property
-    @abstractmethod
-    def default_algorithm(self) -> str:
+    def __init__(self, algorithm: Optional[str] = None) -> None:
         raise NotImplementedError
 
     @property
@@ -31,5 +21,5 @@ class AbstractJWTBackend(metaclass=ABCMeta):
         raise NotImplementedError
 
     @abstractmethod
-    def decode(self, token: str, secret_key: str, auto_error: bool) -> Optional[Dict[str, Any]]:
+    def decode(self, token: str, secret_key: str) -> Optional[Dict[str, Any]]:
         raise NotImplementedError
