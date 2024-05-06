@@ -3,7 +3,7 @@ from typing import Any, Dict, Optional
 try:
     import authlib.jose as authlib_jose
     import authlib.jose.errors as authlib_jose_errors
-except ImportError:
+except ImportError:  # pragma: no cover
     authlib_jose = None
 
 from .abstract_backend import AbstractJWTBackend, BackendException

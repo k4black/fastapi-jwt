@@ -4,7 +4,7 @@ from typing import Any, Dict, Optional
 try:
     import jose
     import jose.jwt
-except ImportError:
+except ImportError:  # pragma: no cover
     jose = None  # type: ignore
 
 from .abstract_backend import AbstractJWTBackend, BackendException

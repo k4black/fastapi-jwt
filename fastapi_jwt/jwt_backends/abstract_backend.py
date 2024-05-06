@@ -2,11 +2,11 @@ from abc import ABC, abstractmethod
 from typing import Any, Dict, Optional
 
 
-class BackendException(Exception):
+class BackendException(Exception):  # pragma: no cover
     pass
 
 
-class AbstractJWTBackend(ABC):
+class AbstractJWTBackend(ABC):  # pragma: no cover
     @abstractmethod
     def __init__(self, algorithm: Optional[str] = None) -> None:
         raise NotImplementedError
