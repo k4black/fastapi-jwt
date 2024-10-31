@@ -43,5 +43,6 @@ class AuthlibJWTBackend(AbstractJWTBackend):
             authlib_jose_errors.InvalidClaimError,
             authlib_jose_errors.InvalidTokenError,
             authlib_jose_errors.DecodeError,
+            authlib_jose_errors.BadSignatureError,
         ) as e:
             raise BackendException(f"Invalid token: {e}")
