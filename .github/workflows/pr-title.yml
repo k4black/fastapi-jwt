@@ -1,0 +1,45 @@
+# Advisory only: this check goes red on a non-conventional PR title but does NOT
+# block the merge. Blocking needs either a required status check (deliberately out
+# of scope here) or the ruleset `commit_message_pattern` rule (GitHub Enterprise).
+# It still catches the mistake where it matters — on the PR page, before merging —
+# and with squash-only merges + squash_merge_commit_title=PR_TITLE, the PR title IS
+# the commit that lands on the default branch.
+name: PR title
+
+on:
+  # pull_request_target, not pull_request: fork PRs get no usable token otherwise.
+  # Safe here because this workflow checks out no code. Trade-off: the config is
+  # read from the default branch, so edits to it don't affect their own PR.
+  pull_request_target:
+    types: [opened, reopened, edited, synchronize]
+
+permissions:
+  pull-requests: read
+
+jobs:
+  lint:
+    name: Conventional Commits
+    runs-on: ubuntu-latest
+    steps:
+      - uses: amannn/action-semantic-pull-request@v6
+        env:
+          # Must be env, not with. The action reads it from the environment.
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          # Newline-delimited regex patterns, not a comma-separated list.
+          types: |
+            build
+            chore
+            ci
+            docs
+            feat
+            fix
+            perf
+            refactor
+            revert
+            style
+            test
+          requireScope: false
+          subjectPattern: ^(?![A-Z]).+$
+          subjectPatternError: |
+            The subject "{subject}" in "{title}" must not start with an uppercase letter.

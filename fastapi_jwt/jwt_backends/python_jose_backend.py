@@ -13,7 +13,7 @@ from .abstract_backend import AbstractJWTBackend, BackendException
 class PythonJoseJWTBackend(AbstractJWTBackend):
     def __init__(self, algorithm: Optional[str] = None) -> None:
         assert jose is not None, "To use PythonJoseJWTBackend, you need to install python-jose"
-        warnings.warn("PythonJoseJWTBackend is deprecated as python-jose library is not maintained anymore.")
+        warnings.warn("PythonJoseJWTBackend is deprecated. Use AuthlibJWTBackend instead.")
 
         self._algorithm = algorithm or self.default_algorithm
         assert (

@@ -112,9 +112,9 @@ def test_security_jwt_access_both_correct(jwt_backend: Type[AbstractJWTBackend])
     client = create_example_client(jwt_backend)
     access_token = client.post("/auth").json()["access_token"]
 
+    client.cookies.update({"access_token_cookie": access_token})
     response = client.get(
         "/users/me",
-        cookies={"access_token_cookie": access_token},
         headers={"Authorization": f"Bearer {access_token}"},
     )
     assert response.status_code == 200, response.text
@@ -125,7 +125,8 @@ def test_security_jwt_access_only_cookie(jwt_backend: Type[AbstractJWTBackend]):
     client = create_example_client(jwt_backend)
     access_token = client.post("/auth").json()["access_token"]
 
-    response = client.get("/users/me", cookies={"access_token_cookie": access_token})
+    client.cookies.update({"access_token_cookie": access_token})
+    response = client.get("/users/me")
     assert response.status_code == 200, response.text
     assert response.json() == {"username": "username", "role": "user"}
 
@@ -143,10 +144,10 @@ def test_security_jwt_access_bearer_wrong_cookie_correct(jwt_backend: Type[Abstr
     client = create_example_client(jwt_backend)
     access_token = client.post("/auth").json()["access_token"]
 
+    client.cookies.update({"access_token_cookie": access_token})
     response = client.get(
         "/users/me",
         headers={"Authorization": "Bearer wrong_access_token"},
-        cookies={"access_token_cookie": access_token},
     )
     assert response.status_code == 401, response.text
     assert response.json()["detail"].startswith("Invalid token:")
@@ -156,10 +157,10 @@ def test_security_jwt_access_bearer_correct_cookie_wrong(jwt_backend: Type[Abstr
     client = create_example_client(jwt_backend)
     access_token = client.post("/auth").json()["access_token"]
 
+    client.cookies.update({"access_token_cookie": "wrong_access_token_cookie"})
     response = client.get(
         "/users/me",
         headers={"Authorization": f"Bearer {access_token}"},
-        cookies={"access_token_cookie": "wrong_access_token_cookie"},
     )
     assert response.status_code == 200, response.text
     assert response.json() == {"username": "username", "role": "user"}
@@ -176,7 +177,8 @@ def test_security_jwt_refresh_only_cookie(jwt_backend: Type[AbstractJWTBackend])
     client = create_example_client(jwt_backend)
     refresh_token = client.post("/auth").json()["refresh_token"]
 
-    response = client.post("/refresh", cookies={"refresh_token_cookie": refresh_token})
+    client.cookies.update({"refresh_token_cookie": refresh_token})
+    response = client.post("/refresh")
     assert response.status_code == 200, response.text
 
 
@@ -184,10 +186,10 @@ def test_security_jwt_refresh_bearer_correct_cookie_wrong(jwt_backend: Type[Abst
     client = create_example_client(jwt_backend)
     refresh_token = client.post("/auth").json()["refresh_token"]
 
+    client.cookies.update({"refresh_token_cookie": "wrong_refresh_token_cookie"})
     response = client.post(
         "/refresh",
         headers={"Authorization": f"Bearer {refresh_token}"},
-        cookies={"refresh_token_cookie": "wrong_refresh_token_cookie"},
     )
     assert response.status_code == 200, response.text
 
@@ -196,10 +198,10 @@ def test_security_jwt_refresh_bearer_wrong_cookie_correct(jwt_backend: Type[Abst
     client = create_example_client(jwt_backend)
     refresh_token = client.post("/auth").json()["refresh_token"]
 
+    client.cookies.update({"refresh_token_cookie": refresh_token})
     response = client.post(
         "/refresh",
         headers={"Authorization": "Bearer wrong_refresh_token_cookie"},
-        cookies={"refresh_token_cookie": refresh_token},
     )
     assert response.status_code == 401, response.text
     assert response.json()["detail"].startswith("Invalid token:")
@@ -211,7 +213,8 @@ def test_security_jwt_refresh_cookie_wrong_using_access_token(jwt_backend: Type[
     access_token, refresh_token = tokens["access_token"], tokens["refresh_token"]
     assert access_token != refresh_token
 
-    response = client.post("/refresh", cookies={"refresh_token_cookie": access_token})
+    client.cookies.update({"refresh_token_cookie": access_token})
+    response = client.post("/refresh")
     assert response.status_code == 401, response.text
     assert response.json()["detail"].startswith("Invalid token: 'type' is not 'refresh'")
 

@@ -1,6 +1,6 @@
 # Developing 
 
-Recommend to use venv for development.  
+Use Python 3.11 or later with a virtual environment for development.
 ```shell
 python3 -m venv .venv
 source .venv/bin/activate
@@ -8,7 +8,7 @@ source .venv/bin/activate
 
 Install dev dependencies 
 ```shell
-python -m pip install .[docs,test]  # \[docs,test\] in zsh
+python -m pip install -e ".[docs,test]"
 ```
 
 
@@ -21,9 +21,10 @@ python -m pip install .[docs,test]  # \[docs,test\] in zsh
 It is important NOT ONLY to get OK from all linters (or achieve score in the case of pylint), but also to write good code.    
 P.S. It's hard to say what a Good Code is. Let's say that it should be simple, clear, commented, and so on.
 ```shell
-python -m flake8 .
+python -m flake8 fastapi_jwt tests
+python -m ruff check fastapi_jwt tests
 python -m mypy fastapi_jwt
-python -m isort . --check
+python -m isort fastapi_jwt --check
 ```
 
 Try NOT ONLY to achieve 100% coverage, but also to cover extreme cases, height load cases, multithreaded cases, incorrect input, and so on.

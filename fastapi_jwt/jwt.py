@@ -1,5 +1,5 @@
 from abc import ABC
-from datetime import datetime, timedelta
+from datetime import UTC, datetime, timedelta
 from typing import Any, Dict, Optional, Set, Type
 from uuid import uuid4
 
@@ -27,14 +27,7 @@ def force_jwt_backend(cls: Type[AbstractJWTBackend]) -> None:
 
 
 def utcnow() -> datetime:
-    try:
-        from datetime import UTC
-    except ImportError:  # pragma: nocover
-        # UTC was added in python 3.12, as datetime.utcnow was
-        # marked for deprecation.
-        return datetime.utcnow()
-    else:
-        return datetime.now(UTC)
+    return datetime.now(UTC)
 
 
 __all__ = [
