@@ -22,6 +22,11 @@ FastAPI native extension, easy and simple JWT auth
 * Cookie setting
 
 
+## Development and releases
+
+Run `python -m ruff check fastapi_jwt tests`, `python -m ruff format --check fastapi_jwt tests`, and `ty check fastapi_jwt`.
+Release Please manages version and changelog PRs. See [the release setup](docs/docs/developing.md#publishing).
+
 ## Installation
 You can access package [fastapi-jwt in pypi](https://pypi.org/project/fastapi-jwt/)
 ```shell

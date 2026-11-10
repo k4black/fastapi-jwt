@@ -23,12 +23,12 @@ class AuthlibJWTBackend(AbstractJWTBackend):
         return self._algorithm
 
     def encode(self, to_encode: Dict[str, Any], secret_key: str) -> str:
-        key = jwk.import_key(secret_key, "oct" if self.algorithm.startswith("HS") else None)
+        key = jwk.import_key(secret_key, "oct") if self.algorithm.startswith("HS") else jwk.import_key(secret_key)
         return jwt.encode({"alg": self.algorithm}, to_encode.copy(), key, algorithms=[self.algorithm])
 
     def decode(self, token: str, secret_key: str) -> Optional[Dict[str, Any]]:
         try:
-            key = jwk.import_key(secret_key, "oct" if self.algorithm.startswith("HS") else None)
+            key = jwk.import_key(secret_key, "oct") if self.algorithm.startswith("HS") else jwk.import_key(secret_key)
             payload = jwt.decode(token, key, algorithms=[self.algorithm]).claims
             jwt.JWTClaimsRegistry(leeway=10, exp={"essential": True}).validate(payload)
             return payload

@@ -21,10 +21,9 @@ python -m pip install -e ".[docs,test]"
 It is important NOT ONLY to get OK from all linters (or achieve score in the case of pylint), but also to write good code.    
 P.S. It's hard to say what a Good Code is. Let's say that it should be simple, clear, commented, and so on.
 ```shell
-python -m flake8 fastapi_jwt tests
 python -m ruff check fastapi_jwt tests
-python -m mypy fastapi_jwt
-python -m isort fastapi_jwt --check
+python -m ruff format --check fastapi_jwt tests
+ty check fastapi_jwt
 ```
 
 Try NOT ONLY to achieve 100% coverage, but also to cover extreme cases, height load cases, multithreaded cases, incorrect input, and so on.
@@ -34,33 +33,40 @@ python -m pytest
 
 You can fix some issues in auto mode.
 
-* Sorting imports and make autopep.
+* Use Ruff to sort imports and format code.
     ```shell
-    python -m isort .
+    python -m ruff check --fix fastapi_jwt tests
+    python -m ruff format fastapi_jwt tests
     ```
 
 
-### Publishing 
+### Publishing
 
-Egg (deprecated) 
-```shell
-python3 setup.py build
-python3 setup.py sdist
-twine upload -r testpypi dist/*
-twine upload dist/*
-```
+Release Please opens a release PR after Conventional Commits reach `main`.
+The release PR updates `VERSION` and `CHANGELOG.md`.
+Merge that PR to create the version tag and GitHub release.
+The Publish workflow builds the tagged source and uploads both distributions to PyPI.
+The workflow then publishes the documentation.
 
-Build Wheel and see what inside
-```shell
-python3 -m pip wheel . --no-deps --wheel-dir dist
-tar --list -f dist/fastapi-jwt-0.0.1-py3-none-any.whl  
-```
+Configure these repository secrets before merging the workflow change:
 
-Load dist to pypi
-```shell
-twine upload -r testpypi dist/*
-twine upload dist/*
-```
+- `RELEASE_APP_ID` and `RELEASE_APP_PRIVATE_KEY`: the GitHub App credentials used by `k4black/hex`.
+- `PYPI_TOKEN`: the existing PyPI token for this package.
+
+Use the same GitHub App as `k4black/hex`:
+
+1. Open GitHub account Settings > Developer settings > GitHub Apps and select that App.
+2. Copy its App ID. Open Install App > Configure for the account and include `k4black/fastapi-jwt`.
+3. Make sure that the App has Contents: Read and write and Pull requests: Read and write permissions.
+4. Use the original private-key PEM file. If unavailable, generate another key under Private keys without revoking the existing key.
+5. Open `k4black/fastapi-jwt` > Settings > Secrets and variables > Actions > New repository secret.
+6. Add `RELEASE_APP_ID` with the App ID.
+7. Add `RELEASE_APP_PRIVATE_KEY` with the complete PEM text, including its BEGIN and END lines.
+
+GitHub does not reveal existing secret values. The values cannot be copied from the hex repository through its secret settings.
+Keep the existing `PYPI_TOKEN`. No PyPI authentication change is required.
+The App token lets release PRs trigger CI and GitHub releases trigger publishing.
+The workflow does not change `main` or move existing tags.
 
 
 ---
