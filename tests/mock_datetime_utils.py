@@ -12,4 +12,4 @@ def create_time_time_mock(**kwargs):
 
 
 def mock_now(mocker, **kwargs):
-    mocker.patch("authlib.jose.rfc7519.claims.time.time", create_time_time_mock(**kwargs))
+    mocker.patch("joserfc._rfc7519.claims.time.time", create_time_time_mock(**kwargs))

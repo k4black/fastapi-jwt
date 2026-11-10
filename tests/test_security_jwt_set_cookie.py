@@ -90,10 +90,7 @@ def test_security_jwt_logout(jwt_backend: Type[AbstractJWTBackend]):
     assert response.status_code == 200, response.text
 
     assert "access_token_cookie" in response.headers["set-cookie"]
-    assert 'access_token_cookie=""; Max-Age=-1;' in response.headers["set-cookie"]
+    assert 'access_token_cookie="";' in response.headers["set-cookie"]
     assert "refresh_token_cookie" in response.headers["set-cookie"]
-    assert 'refresh_token_cookie=""; HttpOnly; Max-Age=-1' in response.headers["set-cookie"]
-    # assert "access_token_cookie" not in response.cookies
-    # assert response.cookies["access_token_cookie"].max_age == -1
-    # assert "refresh_token_cookie" not in response.cookies
-    # assert response.cookies["refresh_token_cookie"].max_age == -1
+    assert 'refresh_token_cookie="";' in response.headers["set-cookie"]
+    assert response.headers["set-cookie"].count("Max-Age=0") == 2

@@ -42,10 +42,10 @@ documentation = "https://k4black.github.io/fastapi-jwt/"
 
 [project.optional-dependencies]
 authlib = [
-    "Authlib >=1.9.5,<2.0.0"
+    "joserfc >=1.8.0,<2.0.0"
 ]
 test = [
-    "Authlib >=1.9.5,<2.0.0",
+    "joserfc >=1.8.0,<2.0.0",
     "httpx2 >=2.16.0,<3.0.0",
     "pytest >=9.2.0,<10.0.0",
     "pytest-cov >=7.1.0,<8.0.0",

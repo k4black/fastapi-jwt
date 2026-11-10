@@ -1,6 +1,7 @@
 from abc import ABC
 from datetime import UTC, datetime, timedelta
-from typing import Any, Dict, Optional, Set, Type
+from math import isfinite
+from typing import Any, Dict, Literal, Optional, Set, Type
 from uuid import uuid4
 
 from fastapi.exceptions import HTTPException
@@ -12,11 +13,7 @@ from starlette.status import HTTP_401_UNAUTHORIZED
 from .jwt_backends import AbstractJWTBackend, authlib_backend
 from .jwt_backends.abstract_backend import BackendException
 
-DEFAULT_JWT_BACKEND: Optional[Type[AbstractJWTBackend]] = None
-if authlib_backend.authlib_jose is not None:
-    DEFAULT_JWT_BACKEND = authlib_backend.AuthlibJWTBackend
-else:  # pragma: nocover
-    raise ImportError("No JWT backend found, please install 'fastapi-jwt[authlib]'")
+DEFAULT_JWT_BACKEND: Type[AbstractJWTBackend] = authlib_backend.AuthlibJWTBackend
 
 
 def force_jwt_backend(cls: Type[AbstractJWTBackend]) -> None:
@@ -49,6 +46,19 @@ class JwtAuthorizationCredentials:
         return self.subject[item]
 
 
+def _validate_payload(payload: Optional[Dict[str, Any]], token_type: str) -> Dict[str, Any]:
+    if not isinstance(payload, dict) or not isinstance(payload.get("subject"), dict):
+        raise BackendException("Invalid token: 'subject' must be an object")
+    if payload.get("type") != token_type:
+        raise BackendException(f"Invalid token: 'type' is not '{token_type}'")
+    exp = payload.get("exp")
+    if isinstance(exp, bool) or not isinstance(exp, (int, float)) or (isinstance(exp, float) and not isfinite(exp)):
+        raise BackendException("Invalid token: 'exp' must be a finite number")
+    if payload.get("jti") is not None and not isinstance(payload["jti"], str):
+        raise BackendException("Invalid token: 'jti' must be a string")
+    return payload
+
+
 class JwtAuthBase(ABC):
     class JwtAccessCookie(APIKeyCookie):
         def __init__(self, *args: Any, **kwargs: Any):
@@ -75,8 +85,6 @@ class JwtAuthBase(ABC):
         access_expires_delta: Optional[timedelta] = None,
         refresh_expires_delta: Optional[timedelta] = None,
     ):
-        assert DEFAULT_JWT_BACKEND is not None, "No JWT backend found, please install 'fastapi-jwt[authlib]'"
-
         self.jwt_backend = DEFAULT_JWT_BACKEND(algorithm)
         self.secret_key = secret_key
 
@@ -102,7 +110,7 @@ class JwtAuthBase(ABC):
     ) -> "JwtAuthBase":
         return cls(
             secret_key=secret_key or other.secret_key,
-            auto_error=auto_error or other.auto_error,
+            auto_error=other.auto_error if auto_error is None else auto_error,
             algorithm=algorithm or other.algorithm,
             access_expires_delta=access_expires_delta or other.access_expires_delta,
             refresh_expires_delta=refresh_expires_delta or other.refresh_expires_delta,
@@ -125,7 +133,7 @@ class JwtAuthBase(ABC):
         }
 
     async def _get_payload(
-        self, bearer: Optional[HTTPBearer], cookie: Optional[APIKeyCookie]
+        self, bearer: Optional[HTTPBearer], cookie: Optional[APIKeyCookie], token_type: str
     ) -> Optional[Dict[str, Any]]:
         token: Optional[str] = None
         if bearer:
@@ -133,16 +141,12 @@ class JwtAuthBase(ABC):
         elif cookie:
             token = str(cookie)
 
-        # Check token exist
-        if not token:
-            if self.auto_error:
-                raise HTTPException(status_code=HTTP_401_UNAUTHORIZED, detail="Credentials are not provided")
-            else:
-                return None
-
         # Try to decode jwt token. auto_error on error
         try:
-            return self.jwt_backend.decode(token, self.secret_key)
+            if not token:
+                raise BackendException("Credentials are not provided")
+            payload = self.jwt_backend.decode(token, self.secret_key)
+            return _validate_payload(payload, token_type)
         except BackendException as e:
             if self.auto_error:
                 raise HTTPException(status_code=HTTP_401_UNAUTHORIZED, detail=str(e))
@@ -172,12 +176,22 @@ class JwtAuthBase(ABC):
         return self.jwt_backend.encode(to_encode, self.secret_key)
 
     @staticmethod
-    def set_access_cookie(response: Response, access_token: str, expires_delta: Optional[timedelta] = None) -> None:
+    def set_access_cookie(
+        response: Response,
+        access_token: str,
+        expires_delta: Optional[timedelta] = None,
+        *,
+        secure: bool = True,
+        httponly: bool = True,
+        samesite: Literal["lax", "strict", "none"] = "lax",
+    ) -> None:
         seconds_expires: Optional[int] = int(expires_delta.total_seconds()) if expires_delta else None
         response.set_cookie(
             key="access_token_cookie",
             value=access_token,
-            httponly=False,
+            httponly=httponly,
+            secure=secure,
+            samesite=samesite,
             max_age=seconds_expires,
         )
 
@@ -186,22 +200,40 @@ class JwtAuthBase(ABC):
         response: Response,
         refresh_token: str,
         expires_delta: Optional[timedelta] = None,
+        *,
+        secure: bool = True,
+        httponly: bool = True,
+        samesite: Literal["lax", "strict", "none"] = "lax",
     ) -> None:
         seconds_expires: Optional[int] = int(expires_delta.total_seconds()) if expires_delta else None
         response.set_cookie(
             key="refresh_token_cookie",
             value=refresh_token,
-            httponly=True,
+            httponly=httponly,
+            secure=secure,
+            samesite=samesite,
             max_age=seconds_expires,
         )
 
     @staticmethod
-    def unset_access_cookie(response: Response) -> None:
-        response.set_cookie(key="access_token_cookie", value="", httponly=False, max_age=-1)
+    def unset_access_cookie(
+        response: Response,
+        *,
+        secure: bool = True,
+        httponly: bool = True,
+        samesite: Literal["lax", "strict", "none"] = "lax",
+    ) -> None:
+        response.delete_cookie("access_token_cookie", secure=secure, httponly=httponly, samesite=samesite)
 
     @staticmethod
-    def unset_refresh_cookie(response: Response) -> None:
-        response.set_cookie(key="refresh_token_cookie", value="", httponly=True, max_age=-1)
+    def unset_refresh_cookie(
+        response: Response,
+        *,
+        secure: bool = True,
+        httponly: bool = True,
+        samesite: Literal["lax", "strict", "none"] = "lax",
+    ) -> None:
+        response.delete_cookie("refresh_token_cookie", secure=secure, httponly=httponly, samesite=samesite)
 
 
 class JwtAccess(JwtAuthBase):
@@ -231,7 +263,7 @@ class JwtAccess(JwtAuthBase):
         bearer: Optional[JwtAuthBase.JwtAccessBearer],
         cookie: Optional[JwtAuthBase.JwtAccessCookie],
     ) -> Optional[JwtAuthorizationCredentials]:
-        payload = await self._get_payload(bearer, cookie)
+        payload = await self._get_payload(bearer, cookie, "access")
 
         if payload:
             return JwtAuthorizationCredentials(payload["subject"], payload.get("jti", None))
@@ -340,19 +372,10 @@ class JwtRefresh(JwtAuthBase):
         bearer: Optional[JwtAuthBase.JwtRefreshBearer],
         cookie: Optional[JwtAuthBase.JwtRefreshCookie],
     ) -> Optional[JwtAuthorizationCredentials]:
-        payload = await self._get_payload(bearer, cookie)
+        payload = await self._get_payload(bearer, cookie, "refresh")
 
         if payload is None:
             return None
-
-        if "type" not in payload or payload["type"] != "refresh":
-            if self.auto_error:
-                raise HTTPException(
-                    status_code=HTTP_401_UNAUTHORIZED,
-                    detail="Invalid token: 'type' is not 'refresh'",
-                )
-            else:
-                return None
 
         return JwtAuthorizationCredentials(payload["subject"], payload.get("jti", None))
 
