@@ -9,7 +9,7 @@
 - [x] Pass lint, typing, documentation builds, distribution checks, and `py.typed` checks.
 - [x] Correct the closed FastAPI integration PR and explain the maintainer decision.
 - [x] Add CI for minimum runtime dependencies and package artifacts.
-- [ ] Require fresh GitHub checks before merging this PR.
+- [x] Pass all eight GitHub CI jobs for the version update PR.
 - [ ] Close superseded version PRs #55, #59, #60, and #62 after this PR merges.
 
 ## Remaining work, in priority order
