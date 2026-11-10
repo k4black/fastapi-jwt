@@ -125,21 +125,23 @@ def test_security_jwt_access_cookie(jwt_backend: Type[AbstractJWTBackend]):
     client.cookies.clear()
     access_token = client.post("/auth").json()["access_token"]
 
-    response = client.get("/users/me", cookies={"access_token_cookie": access_token})
+    client.cookies.update({"access_token_cookie": access_token})
+    response = client.get("/users/me")
     assert response.status_code == 200, response.text
     assert response.json() == {"username": "username", "role": "user"}
 
 
 def test_security_jwt_access_cookie_wrong(jwt_backend: Type[AbstractJWTBackend]):
     client = create_example_client(jwt_backend)
-    response = client.get("/users/me", cookies={"access_token_cookie": "wrong_access_token_cookie"})
+    client.cookies.update({"access_token_cookie": "wrong_access_token_cookie"})
+    response = client.get("/users/me")
     assert response.status_code == 200, response.text
     assert response.json() == {"msg": "Create an account first"}
 
 
 def test_security_jwt_access_cookie_no_credentials(jwt_backend: Type[AbstractJWTBackend]):
     client = create_example_client(jwt_backend)
-    response = client.get("/users/me", cookies={})
+    response = client.get("/users/me")
     assert response.status_code == 200, response.text
     assert response.json() == {"msg": "Create an account first"}
 
@@ -148,19 +150,21 @@ def test_security_jwt_refresh_cookie(jwt_backend: Type[AbstractJWTBackend]):
     client = create_example_client(jwt_backend)
     refresh_token = client.post("/auth").json()["refresh_token"]
 
-    response = client.post("/refresh", cookies={"refresh_token_cookie": refresh_token})
+    client.cookies.update({"refresh_token_cookie": refresh_token})
+    response = client.post("/refresh")
     assert response.status_code == 200, response.text
 
 
 def test_security_jwt_refresh_cookie_wrong(jwt_backend: Type[AbstractJWTBackend]):
     client = create_example_client(jwt_backend)
-    response = client.post("/refresh", cookies={"refresh_token_cookie": "wrong_refresh_token_cookie"})
+    client.cookies.update({"refresh_token_cookie": "wrong_refresh_token_cookie"})
+    response = client.post("/refresh")
     assert response.status_code == 200, response.text
     assert response.json() == {"msg": "Create an account first"}
 
 
 def test_security_jwt_refresh_cookie_no_credentials(jwt_backend: Type[AbstractJWTBackend]):
     client = create_example_client(jwt_backend)
-    response = client.post("/refresh", cookies={})
+    response = client.post("/refresh")
     assert response.status_code == 200, response.text
     assert response.json() == {"msg": "Create an account first"}

@@ -2,7 +2,7 @@
 
 [![Test](https://github.com/k4black/fastapi-jwt/actions/workflows/test.yml/badge.svg)](https://github.com/k4black/fastapi-jwt/actions/workflows/test.yml)
 [![Publish](https://github.com/k4black/fastapi-jwt/actions/workflows/publish.yml/badge.svg)](https://github.com/k4black/fastapi-jwt/actions/workflows/publish.yml)
-[![codecov](https://codecov.io/gh/k4black/fastapi-jwt/branch/master/graph/badge.svg?token=3F9J850FX2)](https://codecov.io/gh/k4black/fastapi-jwt)
+[![codecov](https://codecov.io/gh/k4black/fastapi-jwt/branch/main/graph/badge.svg?token=3F9J850FX2)](https://codecov.io/gh/k4black/fastapi-jwt)
 [![pypi](https://img.shields.io/pypi/v/fastapi-jwt)](https://pypi.org/project/fastapi-jwt/)
 
 FastAPI native extension, easy and simple JWT auth
@@ -26,13 +26,9 @@ FastAPI native extension, easy and simple JWT auth
 You can access package [fastapi-jwt in pypi](https://pypi.org/project/fastapi-jwt/)
 ```shell
 pip install fastapi-jwt[authlib]
-# or
-pip install fastapi-jwt[python_jose]
 ```
 
-The fastapi-jwt will choose the backend automatically if library is installed with the following priority:
-1. authlib
-2. python_jose (deprecated)
+python-jose support was removed due to [GHSA-3qf3-8w2g-rqmx](https://github.com/advisories/GHSA-3qf3-8w2g-rqmx).
 
 ## Usage
 This library made in fastapi style, so it can be used as standard security features 
@@ -81,12 +77,17 @@ For more examples see usage docs
 
 ## FastAPI Integration 
 
-There it is open and maintained [Pull Request #3305](https://github.com/tiangolo/fastapi/pull/3305) to the `fastapi` repo. Currently, not considered.
+[FastAPI PR #3305](https://github.com/fastapi/fastapi/pull/3305) is closed.
+FastAPI declined built-in JWT support because token handling belongs in an external package.
+The maintainer also declined the additional python-jose dependency.
+See the [maintainer response](https://github.com/fastapi/fastapi/pull/3305#issuecomment-3121608562).
+This project remains a separate FastAPI extension.
 
 ## Requirements 
 
-* `fastapi`
-* `authlib` or `python-jose[cryptography]` (deprecated)
+* Python 3.11 or later
+* `fastapi >=0.162.2`
+* `authlib >=1.9.5,<2.0.0`
 
 ## License
 This project is licensed under the terms of the MIT license.

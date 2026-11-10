@@ -1,5 +1,5 @@
 from abc import ABC
-from datetime import datetime, timedelta
+from datetime import UTC, datetime, timedelta
 from typing import Any, Dict, Optional, Set, Type
 from uuid import uuid4
 
@@ -9,16 +9,14 @@ from fastapi.responses import Response
 from fastapi.security import APIKeyCookie, HTTPBearer
 from starlette.status import HTTP_401_UNAUTHORIZED
 
-from .jwt_backends import AbstractJWTBackend, authlib_backend, python_jose_backend
+from .jwt_backends import AbstractJWTBackend, authlib_backend
 from .jwt_backends.abstract_backend import BackendException
 
 DEFAULT_JWT_BACKEND: Optional[Type[AbstractJWTBackend]] = None
 if authlib_backend.authlib_jose is not None:
     DEFAULT_JWT_BACKEND = authlib_backend.AuthlibJWTBackend
-elif python_jose_backend.jose is not None:
-    DEFAULT_JWT_BACKEND = python_jose_backend.PythonJoseJWTBackend
 else:  # pragma: nocover
-    raise ImportError("No JWT backend found, please install 'python-jose' or 'authlib'")
+    raise ImportError("No JWT backend found, please install 'fastapi-jwt[authlib]'")
 
 
 def force_jwt_backend(cls: Type[AbstractJWTBackend]) -> None:
@@ -27,14 +25,7 @@ def force_jwt_backend(cls: Type[AbstractJWTBackend]) -> None:
 
 
 def utcnow() -> datetime:
-    try:
-        from datetime import UTC
-    except ImportError:  # pragma: nocover
-        # UTC was added in python 3.12, as datetime.utcnow was
-        # marked for deprecation.
-        return datetime.utcnow()
-    else:
-        return datetime.now(UTC)
+    return datetime.now(UTC)
 
 
 __all__ = [
@@ -84,7 +75,7 @@ class JwtAuthBase(ABC):
         access_expires_delta: Optional[timedelta] = None,
         refresh_expires_delta: Optional[timedelta] = None,
     ):
-        assert DEFAULT_JWT_BACKEND is not None, "No JWT backend found, please install 'python-jose' or 'authlib'"
+        assert DEFAULT_JWT_BACKEND is not None, "No JWT backend found, please install 'fastapi-jwt[authlib]'"
 
         self.jwt_backend = DEFAULT_JWT_BACKEND(algorithm)
         self.secret_key = secret_key
