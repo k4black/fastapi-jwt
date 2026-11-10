@@ -8,6 +8,8 @@ from fastapi.exceptions import HTTPException
 from fastapi.param_functions import Security
 from fastapi.responses import Response
 from fastapi.security import APIKeyCookie, HTTPBearer
+from joserfc.errors import JoseError
+from joserfc.jwt import JWTClaimsRegistry
 from starlette.status import HTTP_401_UNAUTHORIZED
 
 from .jwt_backends import AbstractJWTBackend, authlib_backend
@@ -38,15 +40,18 @@ __all__ = [
 
 
 class JwtAuthorizationCredentials:
-    def __init__(self, subject: Dict[str, Any], jti: Optional[str] = None):
+    def __init__(self, subject: Dict[str, Any], jti: Optional[str] = None, exp: Optional[float] = None):
         self.subject = subject
         self.jti = jti
+        self.exp = exp
 
     def __getitem__(self, item: str) -> Any:
         return self.subject[item]
 
 
-def _validate_payload(payload: Optional[Dict[str, Any]], token_type: str) -> Dict[str, Any]:
+def _validate_payload(
+    payload: Optional[Dict[str, Any]], token_type: str, claims_registry: Optional[JWTClaimsRegistry] = None
+) -> Dict[str, Any]:
     if not isinstance(payload, dict) or not isinstance(payload.get("subject"), dict):
         raise BackendException("Invalid token: 'subject' must be an object")
     if payload.get("type") != token_type:
@@ -56,6 +61,11 @@ def _validate_payload(payload: Optional[Dict[str, Any]], token_type: str) -> Dic
         raise BackendException("Invalid token: 'exp' must be a finite number")
     if payload.get("jti") is not None and not isinstance(payload["jti"], str):
         raise BackendException("Invalid token: 'jti' must be a string")
+    if claims_registry is not None:
+        try:
+            claims_registry.validate(payload)
+        except JoseError as e:
+            raise BackendException(f"Invalid token: {e}") from e
     return payload
 
 
@@ -84,9 +94,20 @@ class JwtAuthBase(ABC):
         algorithm: Optional[str] = None,
         access_expires_delta: Optional[timedelta] = None,
         refresh_expires_delta: Optional[timedelta] = None,
+        *,
+        audience: Optional[str] = None,
+        issuer: Optional[str] = None,
     ):
         self.jwt_backend = DEFAULT_JWT_BACKEND(algorithm)
         self.secret_key = secret_key
+        self.audience = audience
+        self.issuer = issuer
+        claims_options: Dict[str, Any] = {}
+        if audience is not None:
+            claims_options["aud"] = {"essential": True, "value": audience}
+        if issuer is not None:
+            claims_options["iss"] = {"essential": True, "value": issuer}
+        self._claims_registry = JWTClaimsRegistry(leeway=10, **claims_options) if claims_options else None
 
         self.places = places or {"header"}
         assert self.places.issubset({"header", "cookie"}), "only 'header' and/or 'cookie' places are supported"
@@ -107,6 +128,9 @@ class JwtAuthBase(ABC):
         algorithm: Optional[str] = None,
         access_expires_delta: Optional[timedelta] = None,
         refresh_expires_delta: Optional[timedelta] = None,
+        *,
+        audience: Optional[str] = None,
+        issuer: Optional[str] = None,
     ) -> "JwtAuthBase":
         return cls(
             secret_key=secret_key or other.secret_key,
@@ -114,6 +138,8 @@ class JwtAuthBase(ABC):
             algorithm=algorithm or other.algorithm,
             access_expires_delta=access_expires_delta or other.access_expires_delta,
             refresh_expires_delta=refresh_expires_delta or other.refresh_expires_delta,
+            audience=other.audience if audience is None else audience,
+            issuer=other.issuer if issuer is None else issuer,
         )
 
     def _generate_payload(
@@ -124,13 +150,18 @@ class JwtAuthBase(ABC):
         token_type: str,
     ) -> Dict[str, Any]:
         now = utcnow()
-        return {
+        payload = {
             "subject": subject.copy(),  # main subject
             "type": token_type,  # 'access' or 'refresh' token
             "exp": now + expires_delta,  # expire time
             "iat": now,  # creation time
             "jti": unique_identifier,  # uuid
         }
+        if self.audience is not None:
+            payload["aud"] = self.audience
+        if self.issuer is not None:
+            payload["iss"] = self.issuer
+        return payload
 
     async def _get_payload(
         self, bearer: Optional[HTTPBearer], cookie: Optional[APIKeyCookie], token_type: str
@@ -146,7 +177,7 @@ class JwtAuthBase(ABC):
             if not token:
                 raise BackendException("Credentials are not provided")
             payload = self.jwt_backend.decode(token, self.secret_key)
-            return _validate_payload(payload, token_type)
+            return _validate_payload(payload, token_type, self._claims_registry)
         except BackendException as e:
             if self.auto_error:
                 raise HTTPException(status_code=HTTP_401_UNAUTHORIZED, detail=str(e))
@@ -248,6 +279,9 @@ class JwtAccess(JwtAuthBase):
         algorithm: Optional[str] = None,
         access_expires_delta: Optional[timedelta] = None,
         refresh_expires_delta: Optional[timedelta] = None,
+        *,
+        audience: Optional[str] = None,
+        issuer: Optional[str] = None,
     ):
         super().__init__(
             secret_key,
@@ -256,6 +290,8 @@ class JwtAccess(JwtAuthBase):
             algorithm=algorithm,
             access_expires_delta=access_expires_delta,
             refresh_expires_delta=refresh_expires_delta,
+            audience=audience,
+            issuer=issuer,
         )
 
     async def _get_credentials(
@@ -266,7 +302,7 @@ class JwtAccess(JwtAuthBase):
         payload = await self._get_payload(bearer, cookie, "access")
 
         if payload:
-            return JwtAuthorizationCredentials(payload["subject"], payload.get("jti", None))
+            return JwtAuthorizationCredentials(payload["subject"], payload.get("jti"), payload.get("exp"))
         return None
 
 
@@ -278,6 +314,9 @@ class JwtAccessBearer(JwtAccess):
         algorithm: Optional[str] = None,
         access_expires_delta: Optional[timedelta] = None,
         refresh_expires_delta: Optional[timedelta] = None,
+        *,
+        audience: Optional[str] = None,
+        issuer: Optional[str] = None,
     ):
         super().__init__(
             secret_key=secret_key,
@@ -286,6 +325,8 @@ class JwtAccessBearer(JwtAccess):
             algorithm=algorithm,
             access_expires_delta=access_expires_delta,
             refresh_expires_delta=refresh_expires_delta,
+            audience=audience,
+            issuer=issuer,
         )
 
     async def __call__(
@@ -302,6 +343,9 @@ class JwtAccessCookie(JwtAccess):
         algorithm: Optional[str] = None,
         access_expires_delta: Optional[timedelta] = None,
         refresh_expires_delta: Optional[timedelta] = None,
+        *,
+        audience: Optional[str] = None,
+        issuer: Optional[str] = None,
     ):
         super().__init__(
             secret_key=secret_key,
@@ -310,6 +354,8 @@ class JwtAccessCookie(JwtAccess):
             algorithm=algorithm,
             access_expires_delta=access_expires_delta,
             refresh_expires_delta=refresh_expires_delta,
+            audience=audience,
+            issuer=issuer,
         )
 
     async def __call__(
@@ -327,6 +373,9 @@ class JwtAccessBearerCookie(JwtAccess):
         algorithm: Optional[str] = None,
         access_expires_delta: Optional[timedelta] = None,
         refresh_expires_delta: Optional[timedelta] = None,
+        *,
+        audience: Optional[str] = None,
+        issuer: Optional[str] = None,
     ):
         super().__init__(
             secret_key=secret_key,
@@ -335,6 +384,8 @@ class JwtAccessBearerCookie(JwtAccess):
             algorithm=algorithm,
             access_expires_delta=access_expires_delta,
             refresh_expires_delta=refresh_expires_delta,
+            audience=audience,
+            issuer=issuer,
         )
 
     async def __call__(
@@ -357,6 +408,9 @@ class JwtRefresh(JwtAuthBase):
         algorithm: Optional[str] = None,
         access_expires_delta: Optional[timedelta] = None,
         refresh_expires_delta: Optional[timedelta] = None,
+        *,
+        audience: Optional[str] = None,
+        issuer: Optional[str] = None,
     ):
         super().__init__(
             secret_key,
@@ -365,6 +419,8 @@ class JwtRefresh(JwtAuthBase):
             algorithm=algorithm,
             access_expires_delta=access_expires_delta,
             refresh_expires_delta=refresh_expires_delta,
+            audience=audience,
+            issuer=issuer,
         )
 
     async def _get_credentials(
@@ -377,7 +433,7 @@ class JwtRefresh(JwtAuthBase):
         if payload is None:
             return None
 
-        return JwtAuthorizationCredentials(payload["subject"], payload.get("jti", None))
+        return JwtAuthorizationCredentials(payload["subject"], payload.get("jti"), payload.get("exp"))
 
 
 class JwtRefreshBearer(JwtRefresh):
@@ -388,6 +444,9 @@ class JwtRefreshBearer(JwtRefresh):
         algorithm: Optional[str] = None,
         access_expires_delta: Optional[timedelta] = None,
         refresh_expires_delta: Optional[timedelta] = None,
+        *,
+        audience: Optional[str] = None,
+        issuer: Optional[str] = None,
     ):
         super().__init__(
             secret_key=secret_key,
@@ -396,6 +455,8 @@ class JwtRefreshBearer(JwtRefresh):
             algorithm=algorithm,
             access_expires_delta=access_expires_delta,
             refresh_expires_delta=refresh_expires_delta,
+            audience=audience,
+            issuer=issuer,
         )
 
     async def __call__(
@@ -412,6 +473,9 @@ class JwtRefreshCookie(JwtRefresh):
         algorithm: Optional[str] = None,
         access_expires_delta: Optional[timedelta] = None,
         refresh_expires_delta: Optional[timedelta] = None,
+        *,
+        audience: Optional[str] = None,
+        issuer: Optional[str] = None,
     ):
         super().__init__(
             secret_key=secret_key,
@@ -420,6 +484,8 @@ class JwtRefreshCookie(JwtRefresh):
             algorithm=algorithm,
             access_expires_delta=access_expires_delta,
             refresh_expires_delta=refresh_expires_delta,
+            audience=audience,
+            issuer=issuer,
         )
 
     async def __call__(
@@ -437,6 +503,9 @@ class JwtRefreshBearerCookie(JwtRefresh):
         algorithm: Optional[str] = None,
         access_expires_delta: Optional[timedelta] = None,
         refresh_expires_delta: Optional[timedelta] = None,
+        *,
+        audience: Optional[str] = None,
+        issuer: Optional[str] = None,
     ):
         super().__init__(
             secret_key=secret_key,
@@ -445,6 +514,8 @@ class JwtRefreshBearerCookie(JwtRefresh):
             algorithm=algorithm,
             access_expires_delta=access_expires_delta,
             refresh_expires_delta=refresh_expires_delta,
+            audience=audience,
+            issuer=issuer,
         )
 
     async def __call__(

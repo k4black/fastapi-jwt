@@ -13,3 +13,6 @@
 - Preserve explicit `auto_error=False` overrides in `from_other`.
 - Default cookies to Secure, HttpOnly, and SameSite=Lax. Preserve positional expiration arguments.
 - Replace deprecated `authlib.jose` with joserfc without changing the backend class or installation extra name.
+
+- Expose verified expiration as `JwtAuthorizationCredentials.exp`.
+- Add optional audience and issuer requirements, token claims, and `from_other` inheritance.
