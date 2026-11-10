@@ -167,3 +167,18 @@ def test_rsa_private_signing_and_public_verification():
     )
     assert response.status_code == 200
     assert response.json() == {"name": "rsa"}
+
+
+@pytest.mark.parametrize(
+    "payload",
+    [
+        None,
+        {"subject": {}, "type": "access", "exp": float("nan")},
+        {"subject": {}, "type": "access", "exp": 4102444800, "jti": 123},
+    ],
+)
+def test_validate_custom_backend_payload(mocker, payload):
+    security = JwtAccessBearer(KEY)
+    mocker.patch.object(security.jwt_backend, "decode", return_value=payload)
+    response = client_for(security).get("/", headers={"Authorization": "Bearer custom-token"})
+    assert response.status_code == 401
