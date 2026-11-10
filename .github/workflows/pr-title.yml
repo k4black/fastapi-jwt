@@ -1,9 +1,3 @@
-# Advisory only: this check goes red on a non-conventional PR title but does NOT
-# block the merge. Blocking needs either a required status check (deliberately out
-# of scope here) or the ruleset `commit_message_pattern` rule (GitHub Enterprise).
-# It still catches the mistake where it matters — on the PR page, before merging —
-# and with squash-only merges + squash_merge_commit_title=PR_TITLE, the PR title IS
-# the commit that lands on the default branch.
 name: PR title
 
 on:
