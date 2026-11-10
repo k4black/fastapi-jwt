@@ -9,16 +9,14 @@ from fastapi.responses import Response
 from fastapi.security import APIKeyCookie, HTTPBearer
 from starlette.status import HTTP_401_UNAUTHORIZED
 
-from .jwt_backends import AbstractJWTBackend, authlib_backend, python_jose_backend
+from .jwt_backends import AbstractJWTBackend, authlib_backend
 from .jwt_backends.abstract_backend import BackendException
 
 DEFAULT_JWT_BACKEND: Optional[Type[AbstractJWTBackend]] = None
 if authlib_backend.authlib_jose is not None:
     DEFAULT_JWT_BACKEND = authlib_backend.AuthlibJWTBackend
-elif python_jose_backend.jose is not None:
-    DEFAULT_JWT_BACKEND = python_jose_backend.PythonJoseJWTBackend
 else:  # pragma: nocover
-    raise ImportError("No JWT backend found, please install 'python-jose' or 'authlib'")
+    raise ImportError("No JWT backend found, please install 'fastapi-jwt[authlib]'")
 
 
 def force_jwt_backend(cls: Type[AbstractJWTBackend]) -> None:
@@ -77,7 +75,7 @@ class JwtAuthBase(ABC):
         access_expires_delta: Optional[timedelta] = None,
         refresh_expires_delta: Optional[timedelta] = None,
     ):
-        assert DEFAULT_JWT_BACKEND is not None, "No JWT backend found, please install 'python-jose' or 'authlib'"
+        assert DEFAULT_JWT_BACKEND is not None, "No JWT backend found, please install 'fastapi-jwt[authlib]'"
 
         self.jwt_backend = DEFAULT_JWT_BACKEND(algorithm)
         self.secret_key = secret_key

@@ -26,18 +26,9 @@ FastAPI native extension, easy and simple JWT auth
 You can access package [fastapi-jwt in pypi](https://pypi.org/project/fastapi-jwt/)
 ```shell
 pip install fastapi-jwt[authlib]
-# or
-pip install fastapi-jwt[python_jose]
 ```
 
-The fastapi-jwt will choose the backend automatically if library is installed with the following priority:
-1. authlib
-2. python_jose (deprecated)
-
-The deprecated python-jose backend still has advisories without published fixes.
-Use the Authlib backend for new installations.
-See the [python-jose advisory](https://github.com/advisories/GHSA-3qf3-8w2g-rqmx)
-and the [ecdsa advisory](https://github.com/advisories/GHSA-wj6h-64fc-37mp).
+python-jose support was removed due to [GHSA-3qf3-8w2g-rqmx](https://github.com/advisories/GHSA-3qf3-8w2g-rqmx).
 
 ## Usage
 This library made in fastapi style, so it can be used as standard security features 
@@ -96,7 +87,7 @@ This project remains a separate FastAPI extension.
 
 * Python 3.11 or later
 * `fastapi >=0.162.2`
-* `authlib >=1.9.5,<2.0.0` or `python-jose[cryptography] >=3.5.0` (deprecated backend)
+* `authlib >=1.9.5,<2.0.0`
 
 ## License
 This project is licensed under the terms of the MIT license.

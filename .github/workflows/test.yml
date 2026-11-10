@@ -34,10 +34,6 @@ jobs:
     strategy:
       matrix:
         python-version: ['3.11', '3.12', '3.13', '3.14', '3.15']
-        dependencies: [latest]
-        include:
-          - python-version: '3.11'
-            dependencies: minimum
       fail-fast: false
     steps:
       - uses: actions/checkout@v7
@@ -50,9 +46,6 @@ jobs:
         run: |
           python -m pip install wheel
           python -m pip install -e .[test]
-      - name: Install minimum runtime dependencies
-        if: matrix.dependencies == 'minimum'
-        run: python -m pip install 'fastapi==0.162.2' 'Authlib==1.9.5' 'python-jose[cryptography]==3.5.0'
       - name: Test itself
         run: python -m pytest --cov-report=xml
       - name: Upload coverage
@@ -72,7 +65,7 @@ jobs:
           python-version: '3.11'
           cache: 'pip'
       - name: Install build and documentation dependencies
-        run: python -m pip install '.[docs]' 'build>=1.6.1' 'twine>=7.0.0'
+        run: python -m pip install '.[docs]' build twine
       - name: Build and check distributions
         run: |
           python -m build

@@ -8,7 +8,7 @@ from pytest_mock import MockerFixture
 from fastapi_jwt import JwtAccessBearer, JwtAuthorizationCredentials, JwtRefreshBearer, force_jwt_backend
 from fastapi_jwt.jwt_backends import AbstractJWTBackend
 
-from .mock_datetime_utils import mock_now_for_backend
+from .mock_datetime_utils import mock_now
 
 
 def create_example_client(jwt_backend: Type[AbstractJWTBackend]):
@@ -165,11 +165,11 @@ def test_security_jwt_access_token_expiration(mocker: MockerFixture, jwt_backend
     client, _ = create_example_client(jwt_backend)
     access_token = client.post("/auth").json()["access_token"]
 
-    mock_now_for_backend(mocker, jwt_backend, minutes=3)  # 3 min left
+    mock_now(mocker, minutes=3)  # 3 min left
     response = client.get("/users/me", headers={"Authorization": f"Bearer {access_token}"})
     assert response.status_code == 200, response.text
 
-    mock_now_for_backend(mocker, jwt_backend, days=42)  # 42 days left
+    mock_now(mocker, days=42)  # 42 days left
     response = client.get("/users/me", headers={"Authorization": f"Bearer {access_token}"})
     assert response.status_code == 401, response.text
     assert response.json()["detail"].startswith("Token time expired:")
@@ -220,7 +220,7 @@ def test_security_jwt_refresh_token_expired(mocker: MockerFixture, jwt_backend):
     client, _ = create_example_client(jwt_backend)
     refresh_token = client.post("/auth").json()["refresh_token"]
 
-    mock_now_for_backend(mocker, jwt_backend, days=42)  # 42 days left
+    mock_now(mocker, days=42)  # 42 days left
     response = client.post("/refresh", headers={"Authorization": f"Bearer {refresh_token}"})
     assert response.status_code == 401, response.text
     assert response.json()["detail"].startswith("Token time expired:")
