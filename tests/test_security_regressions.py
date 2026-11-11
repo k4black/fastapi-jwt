@@ -148,6 +148,7 @@ def test_decode_existing_authlib_token():
     }
 
 
+@pytest.mark.filterwarnings("error:Using implicit key type is not recommended")
 def test_rsa_private_signing_and_public_verification():
     from cryptography.hazmat.primitives import serialization
     from cryptography.hazmat.primitives.asymmetric import rsa
