@@ -5,7 +5,8 @@
       "release-type": "simple",
       "version-file": "VERSION",
       "include-component-in-tag": false,
-      "include-v-in-tag": false
+      "include-v-in-tag": false,
+      "bump-minor-pre-major": true
     }
   }
 }

@@ -44,6 +44,7 @@ You can fix some issues in auto mode.
 
 Release Please opens a release PR after Conventional Commits reach `main`.
 The release PR updates `VERSION` and `CHANGELOG.md`.
+Before version 1.0, breaking changes increase the minor version. For example, 0.3.0 becomes 0.4.0.
 Merge that PR to create the version tag and GitHub release.
 The Publish workflow builds the tagged source and uploads both distributions to PyPI.
 The workflow then publishes the documentation.
