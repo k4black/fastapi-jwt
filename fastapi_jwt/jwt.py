@@ -91,8 +91,8 @@ class JwtAuthBase(ABC):
         self.places = places or {"header"}
         assert self.places.issubset({"header", "cookie"}), "only 'header' and/or 'cookie' places are supported"
         self.auto_error = auto_error
-        self.access_expires_delta = access_expires_delta or timedelta(minutes=15)
-        self.refresh_expires_delta = refresh_expires_delta or timedelta(days=31)
+        self.access_expires_delta = timedelta(minutes=15) if access_expires_delta is None else access_expires_delta
+        self.refresh_expires_delta = timedelta(days=31) if refresh_expires_delta is None else refresh_expires_delta
 
     @property
     def algorithm(self) -> str:
@@ -112,8 +112,10 @@ class JwtAuthBase(ABC):
             secret_key=secret_key or other.secret_key,
             auto_error=other.auto_error if auto_error is None else auto_error,
             algorithm=algorithm or other.algorithm,
-            access_expires_delta=access_expires_delta or other.access_expires_delta,
-            refresh_expires_delta=refresh_expires_delta or other.refresh_expires_delta,
+            access_expires_delta=other.access_expires_delta if access_expires_delta is None else access_expires_delta,
+            refresh_expires_delta=(
+                other.refresh_expires_delta if refresh_expires_delta is None else refresh_expires_delta
+            ),
         )
 
     def _generate_payload(
@@ -159,7 +161,7 @@ class JwtAuthBase(ABC):
         expires_delta: Optional[timedelta] = None,
         unique_identifier: Optional[str] = None,
     ) -> str:
-        expires_delta = expires_delta or self.access_expires_delta
+        expires_delta = self.access_expires_delta if expires_delta is None else expires_delta
         unique_identifier = unique_identifier or str(uuid4())
         to_encode = self._generate_payload(subject, expires_delta, unique_identifier, "access")
         return self.jwt_backend.encode(to_encode, self.secret_key)
@@ -170,7 +172,7 @@ class JwtAuthBase(ABC):
         expires_delta: Optional[timedelta] = None,
         unique_identifier: Optional[str] = None,
     ) -> str:
-        expires_delta = expires_delta or self.refresh_expires_delta
+        expires_delta = self.refresh_expires_delta if expires_delta is None else expires_delta
         unique_identifier = unique_identifier or str(uuid4())
         to_encode = self._generate_payload(subject, expires_delta, unique_identifier, "refresh")
         return self.jwt_backend.encode(to_encode, self.secret_key)
@@ -185,7 +187,7 @@ class JwtAuthBase(ABC):
         httponly: bool = True,
         samesite: Literal["lax", "strict", "none"] = "lax",
     ) -> None:
-        seconds_expires: Optional[int] = int(expires_delta.total_seconds()) if expires_delta else None
+        seconds_expires: Optional[int] = int(expires_delta.total_seconds()) if expires_delta is not None else None
         response.set_cookie(
             key="access_token_cookie",
             value=access_token,
@@ -205,7 +207,7 @@ class JwtAuthBase(ABC):
         httponly: bool = True,
         samesite: Literal["lax", "strict", "none"] = "lax",
     ) -> None:
-        seconds_expires: Optional[int] = int(expires_delta.total_seconds()) if expires_delta else None
+        seconds_expires: Optional[int] = int(expires_delta.total_seconds()) if expires_delta is not None else None
         response.set_cookie(
             key="refresh_token_cookie",
             value=refresh_token,
