@@ -50,3 +50,9 @@ other_access_security = JwtAccessCookie.from_other(
 )
 ```
 
+For tokens, `None` uses the configured expiration duration, or the duration copied by `from_other`.
+`timedelta(0)` creates a token with `exp` equal to `iat`.
+Token validation retains its 10-second clock leeway.
+For cookie setters, `timedelta(0)` sets `Max-Age=0` to expire the cookie immediately.
+Cookie expiration uses only the setter's `expires_delta` argument, independently of the configured token duration.
+With `None`, the setter creates a session cookie without `Max-Age`.
