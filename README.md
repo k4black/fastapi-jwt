@@ -23,7 +23,8 @@ See [security advisories](https://github.com/k4black/fastapi-jwt/security/adviso
 * OpenAPI schema generation 
 * Native integration with FastAPI
 * Access/Refresh JWT
-* JTI
+* JTI and expiration metadata
+* Optional audience and issuer validation
 * Cookie setting
 
 
