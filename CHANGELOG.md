@@ -2,47 +2,35 @@
 
 ## [0.4.0](https://github.com/k4black/fastapi-jwt/compare/0.3.1...0.4.0) (2026-11-14)
 
+**Breaking changes**
 
-### ⚠ BREAKING CHANGES
+- Require Python 3.11 or later. CI covers Python 3.11 through 3.15.
+- Remove the python-jose backend and extra due to [GHSA-3qf3-8w2g-rqmx](https://github.com/advisories/GHSA-3qf3-8w2g-rqmx). Install `fastapi-jwt[authlib]` instead.
+- Replace deprecated `authlib.jose` with joserfc. The `authlib` extra and `AuthlibJWTBackend` class names remain available.
+- Default cookies to Secure, HttpOnly, and SameSite=Lax. Use HTTPS, or explicitly set `secure=False` for local HTTP development.
 
-* Require Python 3.11 or later, remove python-jose support, and default cookies to Secure and HttpOnly. The authlib extra and AuthlibJWTBackend class remain available with joserfc.
-* **deps:** update versions and drop python-jose support ([#63](https://github.com/k4black/fastapi-jwt/issues/63))
+**Authentication fixes**
 
-### Features
+- Retain the 0.3.1 fixes for refresh-token confusion, invalid signatures, malformed subjects, and `from_other(auto_error=False)`.
+- Validate expiration and token identifiers through the authentication error path.
+- Preserve `timedelta(0)` in constructors, `from_other`, token creation, and cookie setters. Token validation retains its 10-second clock leeway.
 
-* jwt_backends - create backend mechanism and add authlib support ([#41](https://github.com/k4black/fastapi-jwt/issues/41)) ([0ea6c04](https://github.com/k4black/fastapi-jwt/commit/0ea6c045ab2821ffa47b4bad15fedb4cebbadab7))
+**Features**
 
+- Expose verified expiration through `JwtAuthorizationCredentials.exp`.
+- Add optional audience and issuer validation. Revocation storage and checks remain application responsibilities.
 
-### Bug Fixes
+**Maintenance**
 
-* &lt;3.9 set to tp.Set ([3aa6528](https://github.com/k4black/fastapi-jwt/commit/3aa6528d0eb649631aaec454d230367585d975d9))
-* harden JWT validation and cookie authentication ([#64](https://github.com/k4black/fastapi-jwt/issues/64)) ([7d7f97c](https://github.com/k4black/fastapi-jwt/commit/7d7f97ca1f4df1b60c7c89c9536536303462d836))
-* use explicit UTC timezone instead of `datetime.utcnow` ([#15](https://github.com/k4black/fastapi-jwt/issues/15)) ([60812d4](https://github.com/k4black/fastapi-jwt/commit/60812d4180d84b5d43f9d778338ba19a6fc7b308))
+- Update FastAPI, development dependencies, documentation dependencies, and GitHub Actions.
+- Adopt Release Please, Ruff lint and format, and ty.
+- Replace the personal email in package metadata with GitHub security reporting links.
 
+Changes: [#63](https://github.com/k4black/fastapi-jwt/pull/63), [#64](https://github.com/k4black/fastapi-jwt/pull/64), [#65](https://github.com/k4black/fastapi-jwt/pull/65), [#66](https://github.com/k4black/fastapi-jwt/pull/66), [#68](https://github.com/k4black/fastapi-jwt/pull/68).
 
-### Miscellaneous Chores
+## 0.3.1 (2026-11-14)
 
-* **deps:** update versions and drop python-jose support ([#63](https://github.com/k4black/fastapi-jwt/issues/63)) ([0c6a43f](https://github.com/k4black/fastapi-jwt/commit/0c6a43fd2bda894bdd61a3c4c96498409af8e37c))
-
-## Changelog
-
-## Latest Changes
-
-- Use Release Please for version PRs and publish fixed release tags.
-- Replace Black, isort, Flake8, and mypy with Ruff lint, Ruff format, and ty.
-
-
-- Require Python 3.11 or later. Test Python 3.11 through 3.15.
-- Update FastAPI, Authlib, development dependencies, documentation dependencies, and GitHub Actions.
-- Remove the python-jose backend and extra due to [GHSA-3qf3-8w2g-rqmx](https://github.com/advisories/GHSA-3qf3-8w2g-rqmx). Use `fastapi-jwt[authlib]` instead.
-- Correct the status and rationale of the closed FastAPI integration PR.
-
-- Reject refresh tokens on access routes and reject malformed credential payloads.
-- Map invalid signatures and JOSE validation errors to the existing authentication error path.
-- Preserve explicit `auto_error=False` overrides in `from_other`.
-- Default cookies to Secure, HttpOnly, and SameSite=Lax. Preserve positional expiration arguments.
-- Replace deprecated `authlib.jose` with joserfc without changing the backend class or installation extra name.
-
-- Expose verified expiration as `JwtAuthorizationCredentials.exp`.
-- Add optional audience and issuer requirements, token claims, and `from_other` inheritance.
-- Preserve zero expiration durations in constructors, `from_other`, token creation, and cookie setters.
+- Fix refresh-token confusion, invalid signatures, malformed subjects, and explicit optional-authentication overrides.
+- Preserve Python 3.8 support and both JWT backends.
+- Credit @ohgoodjay as the original finder of the access-token type issue in [#6](https://github.com/k4black/fastapi-jwt/issues/6).
+- See [GHSA-3m23-h9j2-f9xq](https://github.com/k4black/fastapi-jwt/security/advisories/GHSA-3m23-h9j2-f9xq).
