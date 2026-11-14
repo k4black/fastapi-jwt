@@ -2,91 +2,46 @@ name: Publish
 
 on:
   release:
-    types:
-      - created
+    types: [published]
 
+permissions:
+  contents: read
 
 jobs:
-  update-version-and-changelog:
-    runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@v7
-        with:
-          ref: main
-      - name: Update version file
-        run: |
-          cat VERSION
-          echo "VERSION ${{ github.ref_name }}"
-          echo -n "${{ github.ref_name }}" > VERSION
-      - name: Update changelog file
-        run: |
-          echo "CHANGELOG"
-      - name: Commit updated files
-        run: |
-          git config --global user.name 'github-actions'
-          git config --global user.email 'github-actions@users.noreply.github.com'
-          git remote set-url origin https://x-access-token:${{ secrets.GITHUB_TOKEN }}@github.com/${{ github.repository }}
-          git add VERSION CHANGELOG.md
-          git commit -m "Auto version and changelog update [${{ github.ref_name }}]"
-          git push origin
-      - name: Tag new commit
-        run: |
-          git tag --force ${{ github.ref_name }}
-          git push origin ${{ github.ref_name }} --force
-
-  update-release-github:
-    needs: update-version-and-changelog
-    runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@v7
-        with:
-          ref: ${{ github.ref_name }}
-      - name: Update Release description
-        run: |
-          echo "VERSION"
-          echo "CHANGELOG"
-
   release-python-package:
-    needs: update-version-and-changelog
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v7
         with:
-          ref: ${{ github.ref_name }}
-      - name: Setup Python 3.15
-        uses: actions/setup-python@v7
+          ref: ${{ github.event.release.tag_name }}
+          persist-credentials: false
+      - uses: actions/setup-python@v7
         with:
           python-version: '3.15'
-      - name: Build python package
+      - name: Build and check distributions
         run: |
-          python -m pip install wheel twine
-          python -m pip wheel . --no-deps --wheel-dir dist
-          twine upload -u __token__ -p ${{ secrets.PYPI_TOKEN }} dist/*
+          python -m pip install build twine
+          python -m build
+          python -m twine check dist/*
+      - uses: pypa/gh-action-pypi-publish@release/v1
+        with:
+          password: ${{ secrets.PYPI_TOKEN }}
 
   release-github-pages:
-    needs: update-version-and-changelog
+    needs: release-python-package
     runs-on: ubuntu-latest
+    permissions:
+      contents: write
     steps:
       - uses: actions/checkout@v7
         with:
-          ref: ${{ github.ref_name }}
-      - name: Setup Python 3.15
-        uses: actions/setup-python@v7
+          ref: ${{ github.event.release.tag_name }}
+          fetch-depth: 0
+      - uses: actions/setup-python@v7
         with:
           python-version: '3.15'
-      - uses: actions/cache@v6
-        with:
-          path: ${{ env.pythonLocation }}
-          key: ${{ runner.os }}-python-3.15-${{ env.pythonLocation }}-${{ hashFiles('pyproject.toml', 'setup.cfg') }}-docs
-          restore-keys: |
-            ${{ runner.os }}-python-3.15-
-            ${{ runner.os }}-python-
-            ${{ runner.os }}-
-      - name: Install dependencies
-        run: python -m pip install -e .[docs]
-      - name: Build and publish docs
-        run: |
-          git fetch --all
-          # lazydocs
-          python -m mkdocs build --config-file docs/mkdocs.yml
-          python -m mkdocs gh-deploy --config-file docs/mkdocs.yml --force
+          cache: pip
+      - name: Install documentation dependencies
+        run: python -m pip install '.[docs]'
+      - name: Build and publish documentation
+        run: python -m mkdocs gh-deploy --config-file docs/mkdocs.yml --force

@@ -14,13 +14,24 @@ FastAPI native extension, easy and simple JWT auth
 **Source Code:** [github.com/k4black/fastapi-jwt](https://github.com/k4black/fastapi-jwt/)
 
 
+## Security
+
+Report vulnerabilities through [GitHub private reporting](https://github.com/k4black/fastapi-jwt/security/advisories/new).
+See [security advisories](https://github.com/k4black/fastapi-jwt/security/advisories) for affected versions and fixes.
+
 ## Features
 * OpenAPI schema generation 
 * Native integration with FastAPI
 * Access/Refresh JWT
-* JTI
+* JTI and expiration metadata
+* Optional audience and issuer validation
 * Cookie setting
 
+
+## Development and releases
+
+Run `python -m ruff check fastapi_jwt tests`, `python -m ruff format --check fastapi_jwt tests`, and `ty check fastapi_jwt`.
+Release Please manages version and changelog PRs. See [the release setup](docs/docs/developing.md#publishing).
 
 ## Installation
 You can access package [fastapi-jwt in pypi](https://pypi.org/project/fastapi-jwt/)
@@ -87,7 +98,24 @@ This project remains a separate FastAPI extension.
 
 * Python 3.11 or later
 * `fastapi >=0.162.2`
-* `authlib >=1.9.5,<2.0.0`
+* `joserfc >=1.8.0,<2.0.0`
+
+## Security
+
+Access dependencies reject refresh tokens. Invalid signatures and malformed credential payloads return authentication errors.
+`auto_error=False` returns `None` for invalid credentials.
+Tokens must contain an object in `subject`, the expected `type`, and a finite numeric `exp`.
+
+Cookie helpers now default to `secure=True`, `httponly=True`, and `samesite="lax"`.
+Use HTTPS. For local HTTP development, pass `secure=False` explicitly.
+The keyword-only options preserve positional `expires_delta` arguments.
+Use the same cookie options when you unset a cookie.
+SameSite and HttpOnly do not provide complete CSRF protection.
+Applications that accept cookies must validate Origin or use CSRF tokens for state-changing requests.
+Do not change state through GET requests.
+
+The `authlib` installation extra and `AuthlibJWTBackend` class now use joserfc.
+Their public names remain available for compatibility. The implementation does not import deprecated `authlib.jose`.
 
 ## License
 This project is licensed under the terms of the MIT license.

@@ -4,7 +4,6 @@ on:
   push:
     branches: [ main ]
   pull_request:
-    branches: [ main ]
 
 
 jobs:
@@ -19,15 +18,12 @@ jobs:
       - name: Install dependencies
         run: |
           python -m pip install -e .[test]
-      - name: Run isort
-        run: python -m isort fastapi_jwt --check
-      - name: Run linter
-        run: | 
-          # can remove flake8 after https://github.com/astral-sh/ruff/issues/2402
-          python -m flake8 fastapi_jwt tests
-          python -m ruff check fastapi_jwt tests
-      - name: Run mypy
-        run: python -m mypy fastapi_jwt
+      - name: Run Ruff lint
+        run: python -m ruff check fastapi_jwt tests
+      - name: Check Ruff formatting
+        run: python -m ruff format --check fastapi_jwt tests
+      - name: Run ty
+        run: ty check fastapi_jwt
 
   test-python:
     runs-on: ubuntu-latest
