@@ -1,5 +1,6 @@
 from typing import Type
 
+import pytest
 from fastapi import FastAPI, Response
 from fastapi.testclient import TestClient
 
@@ -7,7 +8,7 @@ from fastapi_jwt import JwtAccessCookie, JwtRefreshCookie, force_jwt_backend
 from fastapi_jwt.jwt_backends import AbstractJWTBackend
 
 
-def create_example_client(jwt_backend: Type[AbstractJWTBackend]):
+def create_example_client(jwt_backend: Type[AbstractJWTBackend], cookie_order=("access", "refresh")):
     force_jwt_backend(jwt_backend)
     app = FastAPI()
 
@@ -21,8 +22,13 @@ def create_example_client(jwt_backend: Type[AbstractJWTBackend]):
         access_token = access_security.create_access_token(subject=subject)
         refresh_token = access_security.create_refresh_token(subject=subject)
 
-        access_security.set_access_cookie(response, access_token)
-        refresh_security.set_refresh_cookie(response, refresh_token)
+        cookies = {
+            "access": (access_security.set_access_cookie, access_token),
+            "refresh": (refresh_security.set_refresh_cookie, refresh_token),
+        }
+        for token_type in cookie_order:
+            setter, token = cookies[token_type]
+            setter(response, token)
 
         return {"access_token": access_token, "refresh_token": refresh_token}
 
@@ -33,7 +39,7 @@ def create_example_client(jwt_backend: Type[AbstractJWTBackend]):
 
         return {"msg": "Successful logout"}
 
-    return TestClient(app)
+    return TestClient(app, base_url="https://testserver")
 
 
 openapi_schema = {
@@ -73,11 +79,15 @@ def test_openapi_schema(jwt_backend: Type[AbstractJWTBackend]):
     assert response.json() == openapi_schema
 
 
-def test_security_jwt_auth(jwt_backend: Type[AbstractJWTBackend]):
-    client = create_example_client(jwt_backend)
+@pytest.mark.parametrize("cookie_order", [("access", "refresh"), ("refresh", "access")])
+def test_security_jwt_auth(jwt_backend: Type[AbstractJWTBackend], cookie_order):
+    client = create_example_client(jwt_backend, cookie_order)
     response = client.post("/auth")
     assert response.status_code == 200, response.text
 
+    assert len(response.headers.get_list("set-cookie")) == 2
+    assert client.cookies["access_token_cookie"] == response.json()["access_token"]
+    assert client.cookies["refresh_token_cookie"] == response.json()["refresh_token"]
     assert "access_token_cookie" in response.cookies
     assert response.cookies["access_token_cookie"] == response.json()["access_token"]
     assert "refresh_token_cookie" in response.cookies

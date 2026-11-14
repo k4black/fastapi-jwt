@@ -16,3 +16,4 @@
 
 - Expose verified expiration as `JwtAuthorizationCredentials.exp`.
 - Add optional audience and issuer requirements, token claims, and `from_other` inheritance.
+- Preserve zero expiration durations in constructors, `from_other`, token creation, and cookie setters.
