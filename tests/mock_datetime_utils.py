@@ -11,8 +11,8 @@ _utcnow = datetime.datetime.utcnow
 def create_datetime_mock(**timedelta_kwargs):
     class _FakeDateTime(datetime.datetime):  # pragma: no cover
         @staticmethod
-        def now(**kwargs):
-            return _now() + datetime.timedelta(**timedelta_kwargs)
+        def now(tz=None):
+            return _now(tz) + datetime.timedelta(**timedelta_kwargs)
 
         @staticmethod
         def utcnow(**kwargs):

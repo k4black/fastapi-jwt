@@ -9,7 +9,7 @@ description = "`FastAPI` extension for JTW Auth"
 readme = "README.md"
 license = {text = "MIT License"}
 authors = [
-  {name = "Konstantin Chernyshev", email = "kdchernyshev@gmail.com"},
+  {name = "Konstantin Chernyshev"},
 ]
 dynamic = ["version"]
 
@@ -33,6 +33,8 @@ dependencies = [
 [project.urls]
 homepage = "https://github.com/k4black/fastapi-jwt"
 documentation = "https://k4black.github.io/fastapi-jwt/"
+"Security advisories" = "https://github.com/k4black/fastapi-jwt/security/advisories"
+"Report a vulnerability" = "https://github.com/k4black/fastapi-jwt/security/advisories/new"
 
 
 [project.optional-dependencies]
