@@ -2,6 +2,9 @@
 
 ## Latest Changes
 
+- Use Release Please for version PRs and publish fixed release tags.
+- Replace Black, isort, Flake8, and mypy with Ruff lint, Ruff format, and ty.
+
 
 - Require Python 3.11 or later. Test Python 3.11 through 3.15.
 - Update FastAPI, Authlib, development dependencies, documentation dependencies, and GitHub Actions.

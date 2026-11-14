@@ -14,6 +14,11 @@ FastAPI native extension, easy and simple JWT auth
 **Source Code:** [github.com/k4black/fastapi-jwt](https://github.com/k4black/fastapi-jwt/)
 
 
+## Security
+
+Report vulnerabilities through [GitHub private reporting](https://github.com/k4black/fastapi-jwt/security/advisories/new).
+See [security advisories](https://github.com/k4black/fastapi-jwt/security/advisories) for affected versions and fixes.
+
 ## Features
 * OpenAPI schema generation 
 * Native integration with FastAPI
@@ -22,6 +27,11 @@ FastAPI native extension, easy and simple JWT auth
 * Optional audience and issuer validation
 * Cookie setting
 
+
+## Development and releases
+
+Run `python -m ruff check fastapi_jwt tests`, `python -m ruff format --check fastapi_jwt tests`, and `ty check fastapi_jwt`.
+Release Please manages version and changelog PRs. See [the release setup](docs/docs/developing.md#publishing).
 
 ## Installation
 You can access package [fastapi-jwt in pypi](https://pypi.org/project/fastapi-jwt/)
