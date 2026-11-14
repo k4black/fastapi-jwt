@@ -5,6 +5,9 @@
 [![codecov](https://codecov.io/gh/k4black/fastapi-jwt/branch/main/graph/badge.svg?token=3F9J850FX2)](https://codecov.io/gh/k4black/fastapi-jwt)
 [![pypi](https://img.shields.io/pypi/v/fastapi-jwt)](https://pypi.org/project/fastapi-jwt/)
 
+> [!NOTE]
+> This project is in maintenance mode. We accept bug fixes only. We do not accept new features.
+
 FastAPI native extension, easy and simple JWT auth
 
 ---
