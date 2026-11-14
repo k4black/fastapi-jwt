@@ -13,6 +13,8 @@ FastAPI native extension, easy and simple JWT auth
 **Documentation:** [k4black.github.io/fastapi-jwt](https://k4black.github.io/fastapi-jwt/)  
 **Source Code:** [github.com/k4black/fastapi-jwt](https://github.com/k4black/fastapi-jwt/)
 
+**Security:** [Published advisories](https://github.com/k4black/fastapi-jwt/security/advisories) · [Report a vulnerability privately](https://github.com/k4black/fastapi-jwt/security/advisories/new)
+
 
 ## Features
 * OpenAPI schema generation 
@@ -81,7 +83,10 @@ For more examples see usage docs
 
 ## FastAPI Integration 
 
-There it is open and maintained [Pull Request #3305](https://github.com/tiangolo/fastapi/pull/3305) to the `fastapi` repo. Currently, not considered.
+[FastAPI PR #3305](https://github.com/fastapi/fastapi/pull/3305) is closed.
+FastAPI declined built-in JWT support because token handling belongs in an external package.
+The maintainer also declined the additional python-jose dependency.
+See the [maintainer response](https://github.com/fastapi/fastapi/pull/3305#issuecomment-3121608562).
 
 ## Requirements 
 

@@ -111,7 +111,7 @@ class JwtAuthBase(ABC):
     ) -> "JwtAuthBase":
         return cls(
             secret_key=secret_key or other.secret_key,
-            auto_error=auto_error or other.auto_error,
+            auto_error=other.auto_error if auto_error is None else auto_error,
             algorithm=algorithm or other.algorithm,
             access_expires_delta=access_expires_delta or other.access_expires_delta,
             refresh_expires_delta=refresh_expires_delta or other.refresh_expires_delta,
@@ -151,7 +151,10 @@ class JwtAuthBase(ABC):
 
         # Try to decode jwt token. auto_error on error
         try:
-            return self.jwt_backend.decode(token, self.secret_key)
+            payload = self.jwt_backend.decode(token, self.secret_key)
+            if payload is not None and not isinstance(payload.get("subject"), dict):
+                raise BackendException("Invalid token: 'subject' must be an object")
+            return payload
         except BackendException as e:
             if self.auto_error:
                 raise HTTPException(status_code=HTTP_401_UNAUTHORIZED, detail=str(e))
@@ -242,9 +245,13 @@ class JwtAccess(JwtAuthBase):
     ) -> Optional[JwtAuthorizationCredentials]:
         payload = await self._get_payload(bearer, cookie)
 
-        if payload:
-            return JwtAuthorizationCredentials(payload["subject"], payload.get("jti", None))
-        return None
+        if payload is None:
+            return None
+        if payload.get("type") != "access":
+            if self.auto_error:
+                raise HTTPException(status_code=HTTP_401_UNAUTHORIZED, detail="Invalid token: 'type' is not 'access'")
+            return None
+        return JwtAuthorizationCredentials(payload["subject"], payload.get("jti", None))
 
 
 class JwtAccessBearer(JwtAccess):

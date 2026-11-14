@@ -2,17 +2,17 @@ name: Test
 
 on:
   push:
-    branches: [ main ]
+    branches: [ main, release/0.3 ]
   pull_request:
-    branches: [ main ]
+    branches: [ main, release/0.3 ]
 
 
 jobs:
   lint-python:
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-22.04
     steps:
-      - uses: actions/checkout@v4
-      - uses: actions/setup-python@v5
+      - uses: actions/checkout@v7
+      - uses: actions/setup-python@v7
         with:
           python-version: '3.12'
           cache: 'pip' # caching pip dependencies
@@ -30,15 +30,15 @@ jobs:
         run: python -m mypy fastapi_jwt
 
   test-python:
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-22.04
     strategy:
       matrix:
         python-version: ['3.8', '3.9', '3.10', '3.11', '3.12']
       fail-fast: false
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v7
       - name: Set up Python ${{ matrix.python-version }}
-        uses: actions/setup-python@v5
+        uses: actions/setup-python@v7
         with:
           python-version: ${{ matrix.python-version }}
           cache: 'pip' # caching pip dependencies
@@ -49,7 +49,7 @@ jobs:
       - name: Test itself
         run: python -m pytest --cov-report=xml
       - name: Upload coverage
-        uses: codecov/codecov-action@v4
+        uses: codecov/codecov-action@v7
         with:
           files: coverage.xml
           fail_ci_if_error: true # optional (default = false)
