@@ -486,10 +486,21 @@
     <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
       
         <li class="md-nav__item">
-  <a href="#031" class="md-nav__link">
+  <a href="#040-2026-11-14" class="md-nav__link">
     <span class="md-ellipsis">
       
-        0.3.1
+        0.4.0 (2026-11-14)
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#031-2026-11-14" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        0.3.1 (2026-11-14)
       
     </span>
   </a>
@@ -531,10 +542,21 @@
     <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
       
         <li class="md-nav__item">
-  <a href="#031" class="md-nav__link">
+  <a href="#040-2026-11-14" class="md-nav__link">
     <span class="md-ellipsis">
       
-        0.3.1
+        0.4.0 (2026-11-14)
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#031-2026-11-14" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        0.3.1 (2026-11-14)
       
     </span>
   </a>
@@ -558,20 +580,40 @@
 
 
 
-<!-- BEGIN INCLUDE ../../CHANGELOG.md -->
 <h1 id="changelog">Changelog</h1>
-<h2 id="031">0.3.1</h2>
+<h2 id="040-2026-11-14"><a href="https://github.com/k4black/fastapi-jwt/compare/0.3.1...0.4.0">0.4.0</a> (2026-11-14)</h2>
+<p><strong>Breaking changes</strong></p>
 <ul>
-<li>Reject refresh tokens and tokens without the access type at access-protected endpoints.</li>
-<li>Reject missing or invalid subject objects through the authentication error path.</li>
-<li>Handle invalid Authlib signatures through the authentication error path.</li>
-<li>Preserve explicit <code>auto_error=False</code> overrides in <code>from_other</code>.</li>
-<li>Replace the personal author email with GitHub security reporting links in package metadata.</li>
-<li>Preserve Python 3.8 support, both JWT backends, and existing cookie defaults.</li>
+<li>Require Python 3.11 or later. CI covers Python 3.11 through 3.15.</li>
+<li>Remove the python-jose backend and extra due to <a href="https://github.com/advisories/GHSA-3qf3-8w2g-rqmx">GHSA-3qf3-8w2g-rqmx</a>. Install <code>fastapi-jwt[authlib]</code> instead.</li>
+<li>Replace deprecated <code>authlib.jose</code> with joserfc. The <code>authlib</code> extra and <code>AuthlibJWTBackend</code> class names remain available.</li>
+<li>Default cookies to Secure, HttpOnly, and SameSite=Lax. Use HTTPS, or explicitly set <code>secure=False</code> for local HTTP development.</li>
 </ul>
-<p>Original report: <a href="https://github.com/k4black/fastapi-jwt/issues/6">issue #6</a>, opened by @ohgoodjay on 9 May 2022.
-Security advisory: <a href="https://github.com/k4black/fastapi-jwt/security/advisories/GHSA-3m23-h9j2-f9xq">GHSA-3m23-h9j2-f9xq</a>.</p>
-<!-- END INCLUDE -->
+<p><strong>Authentication fixes</strong></p>
+<ul>
+<li>Retain the 0.3.1 fixes for refresh-token confusion, invalid signatures, malformed subjects, and <code>from_other(auto_error=False)</code>.</li>
+<li>Validate expiration and token identifiers through the authentication error path.</li>
+<li>Preserve <code>timedelta(0)</code> in constructors, <code>from_other</code>, token creation, and cookie setters. Token validation retains its 10-second clock leeway.</li>
+</ul>
+<p><strong>Features</strong></p>
+<ul>
+<li>Expose verified expiration through <code>JwtAuthorizationCredentials.exp</code>.</li>
+<li>Add optional audience and issuer validation. Revocation storage and checks remain application responsibilities.</li>
+</ul>
+<p><strong>Maintenance</strong></p>
+<ul>
+<li>Update FastAPI, development dependencies, documentation dependencies, and GitHub Actions.</li>
+<li>Adopt Release Please, Ruff lint and format, and ty.</li>
+<li>Replace the personal email in package metadata with GitHub security reporting links.</li>
+</ul>
+<p>Changes: <a href="https://github.com/k4black/fastapi-jwt/pull/63">#63</a>, <a href="https://github.com/k4black/fastapi-jwt/pull/64">#64</a>, <a href="https://github.com/k4black/fastapi-jwt/pull/65">#65</a>, <a href="https://github.com/k4black/fastapi-jwt/pull/66">#66</a>, <a href="https://github.com/k4black/fastapi-jwt/pull/68">#68</a>.</p>
+<h2 id="031-2026-11-14">0.3.1 (2026-11-14)</h2>
+<ul>
+<li>Fix refresh-token confusion, invalid signatures, malformed subjects, and explicit optional-authentication overrides.</li>
+<li>Preserve Python 3.8 support and both JWT backends.</li>
+<li>Credit @ohgoodjay as the original finder of the access-token type issue in <a href="https://github.com/k4black/fastapi-jwt/issues/6">#6</a>.</li>
+<li>See <a href="https://github.com/k4black/fastapi-jwt/security/advisories/GHSA-3m23-h9j2-f9xq">GHSA-3m23-h9j2-f9xq</a>.</li>
+</ul>
 
 
 

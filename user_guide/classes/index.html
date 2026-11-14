@@ -455,6 +455,17 @@
   
 </li>
         
+          <li class="md-nav__item">
+  <a href="#audience-issuer-and-expiration" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Audience, issuer, and expiration
+      
+    </span>
+  </a>
+  
+</li>
+        
       </ul>
     </nav>
   
@@ -640,6 +651,17 @@
   
 </li>
         
+          <li class="md-nav__item">
+  <a href="#audience-issuer-and-expiration" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Audience, issuer, and expiration
+      
+    </span>
+  </a>
+  
+</li>
+        
       </ul>
     </nav>
   
@@ -668,7 +690,7 @@
 <h4 id="credentials">Credentials</h4>
 <ul>
 <li><code>JwtAuthorizationCredentials</code> - universal credentials for access and refresh tokens.<br />
-    Provide access to subject and unique token identifier (jti)
+    Provide access to subject, unique token identifier (<code>jti</code>), and expiration (<code>exp</code>, Unix seconds).
     <div class="highlight"><pre><span></span><code><span class="k">def</span><span class="w"> </span><span class="nf">foo</span><span class="p">(</span><span class="n">credentials</span><span class="p">:</span> <span class="n">JwtAuthorizationCredentials</span> <span class="o">=</span> <span class="n">Security</span><span class="p">(</span><span class="n">access_security</span><span class="p">)):</span>
     <span class="k">return</span> <span class="n">credentials</span><span class="p">[</span><span class="s2">"username"</span><span class="p">],</span> <span class="n">credentials</span><span class="o">.</span><span class="n">jti</span>
 </code></pre></div></li>
@@ -705,6 +727,28 @@
     <span class="n">auto_error</span><span class="o">=</span><span class="kc">False</span>
 <span class="p">)</span>
 </code></pre></div></p>
+<p>For tokens, <code>None</code> uses the configured expiration duration, or the duration copied by <code>from_other</code>.
+<code>timedelta(0)</code> creates a token with <code>exp</code> equal to <code>iat</code>.
+Token validation retains its 10-second clock leeway.
+For cookie setters, <code>timedelta(0)</code> sets <code>Max-Age=0</code> to expire the cookie immediately.
+Cookie expiration uses only the setter's <code>expires_delta</code> argument, independently of the configured token duration.
+With <code>None</code>, the setter creates a session cookie without <code>Max-Age</code>.</p>
+<h3 id="audience-issuer-and-expiration">Audience, issuer, and expiration</h3>
+<p>Set <code>audience</code> or <code>issuer</code> when your application requires those claims.
+A configured claim must exist and match. Audience validation also accepts a matching entry in a token audience list.
+The default <code>None</code> does not require a specific audience or issuer.</p>
+<div class="highlight"><pre><span></span><code><span class="n">access_security</span> <span class="o">=</span> <span class="n">JwtAccessBearer</span><span class="p">(</span>
+    <span class="n">secret_key</span><span class="o">=</span><span class="n">secret_key</span><span class="p">,</span>
+    <span class="n">audience</span><span class="o">=</span><span class="s2">"my-api"</span><span class="p">,</span>
+    <span class="n">issuer</span><span class="o">=</span><span class="s2">"my-auth-service"</span><span class="p">,</span>
+<span class="p">)</span>
+<span class="n">refresh_security</span> <span class="o">=</span> <span class="n">JwtRefreshBearer</span><span class="o">.</span><span class="n">from_other</span><span class="p">(</span><span class="n">access_security</span><span class="p">)</span>
+</code></pre></div>
+<p>Generated tokens include the configured claims. <code>from_other</code> copies them unless you supply an override.
+The <code>subject</code> dictionary and credential indexing retain their existing behavior.
+<code>credentials.exp</code> exposes the verified token expiration in Unix seconds.
+Applications can use <code>credentials.jti</code> and <code>credentials.exp</code> to store revocations until the token expires.
+Revocation storage and checks remain application responsibilities.</p>
 
 
 

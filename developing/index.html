@@ -795,46 +795,58 @@
 
 
 <h1 id="developing">Developing</h1>
-<p>Recommend to use venv for development.<br />
+<p>Use Python 3.11 or later with a virtual environment for development.
 <div class="highlight"><pre><span></span><code>python3<span class="w"> </span>-m<span class="w"> </span>venv<span class="w"> </span>.venv
 <span class="nb">source</span><span class="w"> </span>.venv/bin/activate
 </code></pre></div></p>
 <p>Install dev dependencies 
-<div class="highlight"><pre><span></span><code>python<span class="w"> </span>-m<span class="w"> </span>pip<span class="w"> </span>install<span class="w"> </span>.<span class="o">[</span>docs,test<span class="o">]</span><span class="w">  </span><span class="c1"># \[docs,test\] in zsh</span>
+<div class="highlight"><pre><span></span><code>python<span class="w"> </span>-m<span class="w"> </span>pip<span class="w"> </span>install<span class="w"> </span>-e<span class="w"> </span><span class="s2">".[docs,test]"</span>
 </code></pre></div></p>
 <hr />
 <h2 id="python-package">Python package</h2>
 <h3 id="linting-and-testing">Linting and Testing</h3>
 <p>It is important NOT ONLY to get OK from all linters (or achieve score in the case of pylint), but also to write good code.  <br />
 P.S. It's hard to say what a Good Code is. Let's say that it should be simple, clear, commented, and so on.
-<div class="highlight"><pre><span></span><code>python<span class="w"> </span>-m<span class="w"> </span>flake8<span class="w"> </span>.
-python<span class="w"> </span>-m<span class="w"> </span>mypy<span class="w"> </span>fastapi_jwt
-python<span class="w"> </span>-m<span class="w"> </span>isort<span class="w"> </span>.<span class="w"> </span>--check
+<div class="highlight"><pre><span></span><code>python<span class="w"> </span>-m<span class="w"> </span>ruff<span class="w"> </span>check<span class="w"> </span>fastapi_jwt<span class="w"> </span>tests
+python<span class="w"> </span>-m<span class="w"> </span>ruff<span class="w"> </span>format<span class="w"> </span>--check<span class="w"> </span>fastapi_jwt<span class="w"> </span>tests
+ty<span class="w"> </span>check<span class="w"> </span>fastapi_jwt
 </code></pre></div></p>
 <p>Try NOT ONLY to achieve 100% coverage, but also to cover extreme cases, height load cases, multithreaded cases, incorrect input, and so on.
 <div class="highlight"><pre><span></span><code>python<span class="w"> </span>-m<span class="w"> </span>pytest
 </code></pre></div></p>
 <p>You can fix some issues in auto mode.</p>
 <ul>
-<li>Sorting imports and make autopep.
-    <div class="highlight"><pre><span></span><code>python<span class="w"> </span>-m<span class="w"> </span>isort<span class="w"> </span>.
+<li>Use Ruff to sort imports and format code.
+    <div class="highlight"><pre><span></span><code>python<span class="w"> </span>-m<span class="w"> </span>ruff<span class="w"> </span>check<span class="w"> </span>--fix<span class="w"> </span>fastapi_jwt<span class="w"> </span>tests
+python<span class="w"> </span>-m<span class="w"> </span>ruff<span class="w"> </span>format<span class="w"> </span>fastapi_jwt<span class="w"> </span>tests
 </code></pre></div></li>
 </ul>
 <h3 id="publishing">Publishing</h3>
-<p>Egg (deprecated) 
-<div class="highlight"><pre><span></span><code>python3<span class="w"> </span>setup.py<span class="w"> </span>build
-python3<span class="w"> </span>setup.py<span class="w"> </span>sdist
-twine<span class="w"> </span>upload<span class="w"> </span>-r<span class="w"> </span>testpypi<span class="w"> </span>dist/*
-twine<span class="w"> </span>upload<span class="w"> </span>dist/*
-</code></pre></div></p>
-<p>Build Wheel and see what inside
-<div class="highlight"><pre><span></span><code>python3<span class="w"> </span>-m<span class="w"> </span>pip<span class="w"> </span>wheel<span class="w"> </span>.<span class="w"> </span>--no-deps<span class="w"> </span>--wheel-dir<span class="w"> </span>dist
-tar<span class="w"> </span>--list<span class="w"> </span>-f<span class="w"> </span>dist/fastapi-jwt-0.0.1-py3-none-any.whl<span class="w">  </span>
-</code></pre></div></p>
-<p>Load dist to pypi
-<div class="highlight"><pre><span></span><code>twine<span class="w"> </span>upload<span class="w"> </span>-r<span class="w"> </span>testpypi<span class="w"> </span>dist/*
-twine<span class="w"> </span>upload<span class="w"> </span>dist/*
-</code></pre></div></p>
+<p>Release Please opens a release PR after Conventional Commits reach <code>main</code>.
+The release PR updates <code>VERSION</code> and <code>CHANGELOG.md</code>.
+Before version 1.0, breaking changes increase the minor version. For example, 0.3.0 becomes 0.4.0.
+Merge that PR to create the version tag and GitHub release.
+The Publish workflow builds the tagged source and uploads both distributions to PyPI.
+The workflow then publishes the documentation.</p>
+<p>Configure these repository secrets before merging the workflow change:</p>
+<ul>
+<li><code>RELEASE_APP_ID</code> and <code>RELEASE_APP_PRIVATE_KEY</code>: the GitHub App credentials used by <code>k4black/hex</code>.</li>
+<li><code>PYPI_TOKEN</code>: the existing PyPI token for this package.</li>
+</ul>
+<p>Use the same GitHub App as <code>k4black/hex</code>:</p>
+<ol>
+<li>Open GitHub account Settings &gt; Developer settings &gt; GitHub Apps and select that App.</li>
+<li>Copy its App ID. Open Install App &gt; Configure for the account and include <code>k4black/fastapi-jwt</code>.</li>
+<li>Make sure that the App has Contents: Read and write and Pull requests: Read and write permissions.</li>
+<li>Use the original private-key PEM file. If unavailable, generate another key under Private keys without revoking the existing key.</li>
+<li>Open <code>k4black/fastapi-jwt</code> &gt; Settings &gt; Secrets and variables &gt; Actions &gt; New repository secret.</li>
+<li>Add <code>RELEASE_APP_ID</code> with the App ID.</li>
+<li>Add <code>RELEASE_APP_PRIVATE_KEY</code> with the complete PEM text, including its BEGIN and END lines.</li>
+</ol>
+<p>GitHub does not reveal existing secret values. The values cannot be copied from the hex repository through its secret settings.
+Keep the existing <code>PYPI_TOKEN</code>. No PyPI authentication change is required.
+The App token lets release PRs trigger CI and GitHub releases trigger publishing.
+The workflow does not change <code>main</code> or move existing tags.</p>
 <hr />
 <h2 id="docs">Docs</h2>
 <h3 id="editing">Editing</h3>

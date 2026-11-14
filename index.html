@@ -322,10 +322,32 @@
     <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
       
         <li class="md-nav__item">
+  <a href="#security" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Security
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
   <a href="#features" class="md-nav__link">
     <span class="md-ellipsis">
       
         Features
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#development-and-releases" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Development and releases
       
     </span>
   </a>
@@ -381,6 +403,17 @@
     <span class="md-ellipsis">
       
         Requirements
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#security_1" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Security
       
     </span>
   </a>
@@ -597,10 +630,32 @@
     <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
       
         <li class="md-nav__item">
+  <a href="#security" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Security
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
   <a href="#features" class="md-nav__link">
     <span class="md-ellipsis">
       
         Features
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#development-and-releases" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Development and releases
       
     </span>
   </a>
@@ -663,6 +718,17 @@
 </li>
       
         <li class="md-nav__item">
+  <a href="#security_1" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Security
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
   <a href="#license" class="md-nav__link">
     <span class="md-ellipsis">
       
@@ -690,34 +756,35 @@
 
 
 
-<!-- BEGIN INCLUDE ../../README.md -->
 <h1 id="fastapi-jwt">fastapi-jwt</h1>
 <p><a href="https://github.com/k4black/fastapi-jwt/actions/workflows/test.yml"><img alt="Test" src="https://github.com/k4black/fastapi-jwt/actions/workflows/test.yml/badge.svg" /></a>
 <a href="https://github.com/k4black/fastapi-jwt/actions/workflows/publish.yml"><img alt="Publish" src="https://github.com/k4black/fastapi-jwt/actions/workflows/publish.yml/badge.svg" /></a>
-<a href="https://codecov.io/gh/k4black/fastapi-jwt"><img alt="codecov" src="https://codecov.io/gh/k4black/fastapi-jwt/branch/master/graph/badge.svg?token=3F9J850FX2" /></a>
+<a href="https://codecov.io/gh/k4black/fastapi-jwt"><img alt="codecov" src="https://codecov.io/gh/k4black/fastapi-jwt/branch/main/graph/badge.svg?token=3F9J850FX2" /></a>
 <a href="https://pypi.org/project/fastapi-jwt/"><img alt="pypi" src="https://img.shields.io/pypi/v/fastapi-jwt" /></a></p>
 <p>FastAPI native extension, easy and simple JWT auth</p>
 <hr />
 <p><strong>Documentation:</strong> <a href="https://k4black.github.io/fastapi-jwt/">k4black.github.io/fastapi-jwt</a><br />
 <strong>Source Code:</strong> <a href="https://github.com/k4black/fastapi-jwt/">github.com/k4black/fastapi-jwt</a></p>
-<p><strong>Security:</strong> <a href="https://github.com/k4black/fastapi-jwt/security/advisories">Published advisories</a> · <a href="https://github.com/k4black/fastapi-jwt/security/advisories/new">Report a vulnerability privately</a></p>
+<h2 id="security">Security</h2>
+<p>Report vulnerabilities through <a href="https://github.com/k4black/fastapi-jwt/security/advisories/new">GitHub private reporting</a>.
+See <a href="https://github.com/k4black/fastapi-jwt/security/advisories">security advisories</a> for affected versions and fixes.</p>
 <h2 id="features">Features</h2>
 <ul>
 <li>OpenAPI schema generation </li>
 <li>Native integration with FastAPI</li>
 <li>Access/Refresh JWT</li>
-<li>JTI</li>
+<li>JTI and expiration metadata</li>
+<li>Optional audience and issuer validation</li>
 <li>Cookie setting</li>
 </ul>
+<h2 id="development-and-releases">Development and releases</h2>
+<p>Run <code>python -m ruff check fastapi_jwt tests</code>, <code>python -m ruff format --check fastapi_jwt tests</code>, and <code>ty check fastapi_jwt</code>.
+Release Please manages version and changelog PRs. See <a href="developing/#publishing">the release setup</a>.</p>
 <h2 id="installation">Installation</h2>
 <p>You can access package <a href="https://pypi.org/project/fastapi-jwt/">fastapi-jwt in pypi</a>
 <div class="highlight"><pre><span></span><code>pip<span class="w"> </span>install<span class="w"> </span>fastapi-jwt<span class="o">[</span>authlib<span class="o">]</span>
-<span class="c1"># or</span>
-pip<span class="w"> </span>install<span class="w"> </span>fastapi-jwt<span class="o">[</span>python_jose<span class="o">]</span>
 </code></pre></div></p>
-<p>The fastapi-jwt will choose the backend automatically if library is installed with the following priority:
-1. authlib
-2. python_jose (deprecated)</p>
+<p>python-jose support was removed due to <a href="https://github.com/advisories/GHSA-3qf3-8w2g-rqmx">GHSA-3qf3-8w2g-rqmx</a>.</p>
 <h2 id="usage">Usage</h2>
 <p>This library made in fastapi style, so it can be used as standard security features </p>
 <div class="highlight"><pre><span></span><code><span class="kn">from</span><span class="w"> </span><span class="nn">fastapi</span><span class="w"> </span><span class="kn">import</span> <span class="n">FastAPI</span><span class="p">,</span> <span class="n">Security</span><span class="p">,</span> <span class="n">Response</span>
@@ -765,15 +832,29 @@ pip<span class="w"> </span>install<span class="w"> </span>fastapi-jwt<span class
 <p><a href="https://github.com/fastapi/fastapi/pull/3305">FastAPI PR #3305</a> is closed.
 FastAPI declined built-in JWT support because token handling belongs in an external package.
 The maintainer also declined the additional python-jose dependency.
-See the <a href="https://github.com/fastapi/fastapi/pull/3305#issuecomment-3121608562">maintainer response</a>.</p>
+See the <a href="https://github.com/fastapi/fastapi/pull/3305#issuecomment-3121608562">maintainer response</a>.
+This project remains a separate FastAPI extension.</p>
 <h2 id="requirements">Requirements</h2>
 <ul>
-<li><code>fastapi</code></li>
-<li><code>authlib</code> or <code>python-jose[cryptography]</code> (deprecated)</li>
+<li>Python 3.11 or later</li>
+<li><code>fastapi &gt;=0.162.2</code></li>
+<li><code>joserfc &gt;=1.8.0,&lt;2.0.0</code></li>
 </ul>
+<h2 id="security_1">Security</h2>
+<p>Access dependencies reject refresh tokens. Invalid signatures and malformed credential payloads return authentication errors.
+<code>auto_error=False</code> returns <code>None</code> for invalid credentials.
+Tokens must contain an object in <code>subject</code>, the expected <code>type</code>, and a finite numeric <code>exp</code>.</p>
+<p>Cookie helpers now default to <code>secure=True</code>, <code>httponly=True</code>, and <code>samesite="lax"</code>.
+Use HTTPS. For local HTTP development, pass <code>secure=False</code> explicitly.
+The keyword-only options preserve positional <code>expires_delta</code> arguments.
+Use the same cookie options when you unset a cookie.
+SameSite and HttpOnly do not provide complete CSRF protection.
+Applications that accept cookies must validate Origin or use CSRF tokens for state-changing requests.
+Do not change state through GET requests.</p>
+<p>The <code>authlib</code> installation extra and <code>AuthlibJWTBackend</code> class now use joserfc.
+Their public names remain available for compatibility. The implementation does not import deprecated <code>authlib.jose</code>.</p>
 <h2 id="license">License</h2>
 <p>This project is licensed under the terms of the MIT license.</p>
-<!-- END INCLUDE -->
 
 
 
